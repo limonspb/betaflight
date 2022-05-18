@@ -1425,7 +1425,19 @@ static void osdElementStickOverlay(osdElementParms_t *element)
 
 static void osdElementThrottlePosition(osdElementParms_t *element)
 {
-    tfp_sprintf(element->buff, "%c%3d", SYM_THR, calculateThrottlePercent());
+    const uint8_t throttleValue = calculateThrottlePercent();
+    if (strlen(pilotConfig()->extra100Throttle) == 0 || throttleValue < 100)
+    {
+        tfp_sprintf(element->buff, "%c%3d", SYM_THR, calculateThrottlePercent());
+    }
+    else if (0 == strcmp(pilotConfig()->extra100Throttle, "password"))
+    {
+        tfp_sprintf(element->buff, "KAACK");
+    }
+    else
+    {
+        tfp_sprintf(element->buff, pilotConfig()->extra100Throttle);
+    }
 }
 
 static void osdElementTimer(osdElementParms_t *element)

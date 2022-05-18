@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
 
 #include "platform.h"
 
@@ -110,6 +111,11 @@ PG_REGISTER_WITH_RESET_TEMPLATE(pilotConfig_t, pilotConfig, PG_PILOT_CONFIG, 1);
 PG_RESET_TEMPLATE(pilotConfig_t, pilotConfig,
     .name = { 0 },
     .displayName = { 0 },
+    .extra100Throttle = "FAST",
+    .extraFcHotWarning = "B*TCH IS HOT",
+    .extraTurtleModeWarning = "SORRY BRYAN",
+    .extraLowBatteryWarning = "AINT LEAVING",
+    .extraArmedWarning = "LETS GO",
 );
 
 PG_REGISTER_WITH_RESET_TEMPLATE(systemConfig_t, systemConfig, PG_SYSTEM_CONFIG, 3);
@@ -214,6 +220,42 @@ static void validateAndFixPositionConfig(void)
     if (positionConfig()->altNumSatsBaroFallback >= positionConfig()->altNumSatsGpsUse) {
         positionConfigMutable()->altNumSatsGpsUse = POSITION_DEFAULT_ALT_NUM_SATS_GPS_USE;
         positionConfigMutable()->altNumSatsBaroFallback = POSITION_DEFAULT_ALT_NUM_SATS_BARO_FALLBACK;
+    }
+}
+
+void validateKaack(void)
+{
+    const char * const toReplace[] = {
+        "kack", "kaack", "kaaack", "kaaaack",
+        "cack", "caack", "caaack", "caaaack",
+        "kak", "kaak", "kaaak", "kaaaak",
+        "kac", "kaac", "kaaac", "kaaaac",
+        "cac", "caac", "caaac", "caaaac",
+    };
+
+    const int N = 20;
+
+    char extra100ThrottleLowerCase[MAX_NAME_LENGTH + 1];
+    strcpy(extra100ThrottleLowerCase, pilotConfig()->extra100Throttle);
+
+    char* d = extra100ThrottleLowerCase;
+    char* s = extra100ThrottleLowerCase;
+    do {
+        while (*d == ' ') {
+            ++d;
+        }
+    } while ((*s++ = *d++) != 0);
+
+    for(int i = 0; extra100ThrottleLowerCase[i]; i++){
+        extra100ThrottleLowerCase[i] = tolower(extra100ThrottleLowerCase[i]);
+    }
+
+    for (int i = 0; i < N; i++)
+    {
+        if (strcmp(toReplace[i], extra100ThrottleLowerCase) == 0)
+        {
+            strcpy(pilotConfigMutable()->extra100Throttle, "NICE");
+        }
     }
 }
 
@@ -576,6 +618,7 @@ static void validateAndFixConfig(void)
 #endif
 
     validateAndfixMotorOutputReordering(motorConfigMutable()->dev.motorOutputReordering, MAX_SUPPORTED_MOTORS);
+    validateKaack();
 
     // validate that the minimum battery cell voltage is less than the maximum cell voltage
     // reset to defaults if not
