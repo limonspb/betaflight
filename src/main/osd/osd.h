@@ -304,6 +304,7 @@ typedef struct osdConfig_s {
     uint16_t framerate_hz;
     uint8_t cms_background_type;              // For supporting devices, determines whether the CMS background is transparent or opaque
     uint8_t stat_show_cell_value;
+    uint8_t extra_osd_use_quick_menu;         // use QUICK menu YES/NO
 } osdConfig_t;
 
 PG_DECLARE(osdConfig_t, osdConfig);
