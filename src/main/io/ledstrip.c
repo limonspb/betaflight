@@ -132,6 +132,7 @@ void pgResetFn_ledStripConfig(ledStripConfig_t *ledStripConfig)
     ledStripConfig->ledstrip_beacon_armed_only = false; // blink always
     ledStripConfig->ledstrip_visual_beeper_color = VISUAL_BEEPER_COLOR;
     ledStripConfig->ledstrip_brightness = 100;
+    ledStripConfig->extraLedstrip3Colors = false;
 #ifndef UNIT_TEST
     ledStripConfig->ioTag = timerioTagGetByUsage(TIM_USE_LED, 0);
 #endif
@@ -469,6 +470,11 @@ static const struct {
 
 static void applyLedFixedLayers(void)
 {
+    if (ledStripConfig()->extraLedstrip3Colors)
+    {
+        return;
+    }
+
     for (int ledIndex = 0; ledIndex < ledCounts.count; ledIndex++) {
         const ledConfig_t *ledConfig = &ledStripStatusModeConfig()->ledConfigs[ledIndex];
         hsvColor_t color = *getSC(LED_SCOLOR_BACKGROUND);
@@ -953,7 +959,7 @@ static void applyLarsonScannerLayer(bool updateNow, timeUs_t *timer)
 }
 
 // blink twice, then wait ; either always or just when landing
-static void applyLedBlinkLayer(bool updateNow, timeUs_t *timer)
+static void applyLedBlinkLayerClassic(bool updateNow, timeUs_t *timer)
 {
     const uint16_t blinkPattern = 0x8005; // 0b1000000000000101;
     static uint16_t blinkMask;
@@ -975,6 +981,61 @@ static void applyLedBlinkLayer(bool updateNow, timeUs_t *timer)
                 setLedHsv(i, getSC(LED_SCOLOR_BLINKBACKGROUND));
             }
         }
+    }
+}
+
+static void applyLedBlinkLayer3colors(bool updateNow, timeUs_t *timer)
+{
+    const uint16_t blinkPattern = 0x5555; // 0b0101010101010101;
+    static uint16_t blinkMask;
+    static uint8_t current = 0;
+
+    if (updateNow) {
+        blinkMask = blinkMask >> 1;
+        if (blinkMask <= 1)
+            blinkMask = blinkPattern;
+
+        for (int i = 0; i < ledCounts.count; ++i) {
+                hsvColor_t ledColor;
+                ledColor.s = 0;
+                ledColor.v = 255;
+
+                switch (current) {
+                    case 0:
+                    case 1:
+                        ledColor.h = 0;
+                        break;
+                    case 2:
+                    case 3:
+                        ledColor.h = 120;
+                        break;
+                    case 4:
+                    case 5:
+                        ledColor.h = 240;
+                        break;
+                }
+
+                current ++;
+                if (6 == current) {
+                    current = 0;
+                }
+
+                setLedHsv(i, &ledColor);
+        }
+
+        *timer += HZ_TO_US(10);
+    }
+}
+
+static void applyLedBlinkLayer(bool updateNow, timeUs_t *timer)
+{
+    if (ledStripConfig()->extraLedstrip3Colors)
+    {
+        applyLedBlinkLayer3colors(updateNow, timer);
+    }
+    else
+    {
+        applyLedBlinkLayerClassic(updateNow, timer);
     }
 }
 
