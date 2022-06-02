@@ -190,6 +190,9 @@ const osd_stats_e osdStatsDisplayOrder[OSD_STAT_COUNT] = {
     OSD_STAT_TOTAL_DIST,
     OSD_STAT_EXTRA_KAACK,
     OSD_STAT_EXTRA_KAACK_TOTAL,
+    OSD_STAT_EXTRA_KAACK_TIME,
+    OSD_STAT_EXTRA_KAACK_TIME_TOTAL,
+    OSD_STAT_EXTRA_AVG_THROTTLE
 };
 
 // Group elements in a number of groups to reduce task scheduling overhead
@@ -500,6 +503,9 @@ static void osdResetStats(void)
     stats.min_link_quality = (linkQualitySource == LQ_SOURCE_NONE) ? 99 : 100; // percent
     stats.min_rssi_dbm = CRSF_SNR_MAX;
     stats.extra_kaacks = 0;
+    stats.extra_kaack_time = 0;
+    stats.extra_throttle_sum = 0;
+    stats.extra_throttle_count = 0;
 }
 
 #if defined(USE_ESC_SENSOR) || defined(USE_DSHOT_TELEMETRY)
@@ -885,6 +891,30 @@ static bool osdDisplayStat(int statistic, uint8_t displayRow)
         osdDisplayStatisticLabel(displayRow, "TOTAL KAACKS", buff);
         return true;
 
+    case OSD_STAT_EXTRA_KAACK_TIME:
+        {
+            int seconds = stats.extra_kaack_time / 1000000;
+            const int minutes = seconds / 60;
+            seconds = seconds % 60;
+            tfp_sprintf(buff, "%02d:%02d", minutes, seconds);
+        }
+
+        osdDisplayStatisticLabel(displayRow, "KAACK TIME", buff);
+        return true;
+    case OSD_STAT_EXTRA_KAACK_TIME_TOTAL:
+        {
+            int seconds = statsConfig()->stats_extra_total_kaack_time;
+            const int minutes = seconds / 60;
+            seconds = seconds % 60;
+            tfp_sprintf(buff, "%02d:%02d", minutes, seconds);
+        }
+
+        osdDisplayStatisticLabel(displayRow, "TOTAL KAACK TIME", buff);
+        return true;
+    case OSD_STAT_EXTRA_AVG_THROTTLE:
+        itoa(stats.extra_throttle_sum / stats.extra_throttle_count, buff, 10);
+        osdDisplayStatisticLabel(displayRow, "AVG THROTTLE", buff);
+        return true;
     }
     return false;
 }
@@ -1077,6 +1107,16 @@ STATIC_UNIT_TESTED bool osdProcessStats1(timeUs_t currentTimeUs)
         timeUs_t deltaT = currentTimeUs - lastTimeUs;
         osdFlyTime += deltaT;
         stats.armed_time += deltaT;
+
+        const uint8_t throttleValue = calculateThrottlePercent();
+
+        stats.extra_throttle_count ++;
+        stats.extra_throttle_sum += throttleValue;
+
+        if (100 == throttleValue) {
+            stats.extra_kaack_time += deltaT;
+        }
+
     } else if (osdStatsEnabled) {  // handle showing/hiding stats based on OSD disable switch position
         if (displayIsGrabbed(osdDisplayPort)) {
             osdStatsEnabled = false;
