@@ -95,6 +95,7 @@ void statsOnDisarm(void)
         }
 
         statsConfigMutable()->stats_extra_total_kaacks += osdGetStats()->extra_kaacks;
+        statsConfigMutable()->stats_extra_total_kaack_time += (osdGetStats()->extra_kaack_time / 1000000);
 
         dispatchAdd(&writeStatsEntry, STATS_SAVE_DELAY_US);
     }
