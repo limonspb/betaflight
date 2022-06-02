@@ -33,6 +33,7 @@
 #include "io/gps.h"
 
 #include "pg/stats.h"
+#include "osd/osd.h"
 
 
 #define STATS_SAVE_DELAY_US 500000 // Let disarming complete and save stats after this time
@@ -91,15 +92,11 @@ void statsOnDisarm(void)
             statsConfigMutable()->stats_total_flights += 1;    // arm / flight counter
             statsConfigMutable()->stats_total_time_s += dtS;
             statsConfigMutable()->stats_total_dist_m += (DISTANCE_FLOWN_CM - arm_distance_cm) / 100;
-
-            saveRequired = true;
         }
 
-        if (saveRequired) {
-            /* signal that stats need to be saved but don't execute time consuming flash operation
-               now - let the disarming process complete and then execute the actual save */
-            dispatchAdd(&writeStatsEntry, STATS_SAVE_DELAY_US);
-        }
+        statsConfigMutable()->stats_extra_total_kaacks += osdGetStats()->extra_kaacks;
+
+        dispatchAdd(&writeStatsEntry, STATS_SAVE_DELAY_US);
     }
 }
 #endif

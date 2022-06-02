@@ -188,6 +188,8 @@ const osd_stats_e osdStatsDisplayOrder[OSD_STAT_COUNT] = {
     OSD_STAT_TOTAL_FLIGHTS,
     OSD_STAT_TOTAL_TIME,
     OSD_STAT_TOTAL_DIST,
+    OSD_STAT_EXTRA_KAACK,
+    OSD_STAT_EXTRA_KAACK_TOTAL,
 };
 
 // Group elements in a number of groups to reduce task scheduling overhead
@@ -497,6 +499,7 @@ static void osdResetStats(void)
     stats.max_esc_rpm  = 0;
     stats.min_link_quality = (linkQualitySource == LQ_SOURCE_NONE) ? 99 : 100; // percent
     stats.min_rssi_dbm = CRSF_SNR_MAX;
+    stats.extra_kaacks = 0;
 }
 
 #if defined(USE_ESC_SENSOR) || defined(USE_DSHOT_TELEMETRY)
@@ -873,6 +876,15 @@ static bool osdDisplayStat(int statistic, uint8_t displayRow)
         osdDisplayStatisticLabel(displayRow, "TOTAL DISTANCE", buff);
         return true;
 #endif
+    case OSD_STAT_EXTRA_KAACK:
+        itoa(stats.extra_kaacks, buff, 10);
+        osdDisplayStatisticLabel(displayRow, "KAACKS", buff);
+        return true;
+    case OSD_STAT_EXTRA_KAACK_TOTAL:
+        itoa(statsConfig()->stats_extra_total_kaacks, buff, 10);
+        osdDisplayStatisticLabel(displayRow, "TOTAL KAACKS", buff);
+        return true;
+
     }
     return false;
 }
