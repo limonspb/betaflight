@@ -34,5 +34,6 @@ PG_RESET_TEMPLATE(statsConfig_t, statsConfig,
     .stats_total_flights = 0,
     .stats_total_time_s = 0,
     .stats_total_dist_m = 0,
+    .stats_extra_total_kaacks = 0,
 );
 #endif
