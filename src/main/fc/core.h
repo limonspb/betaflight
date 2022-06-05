@@ -98,3 +98,5 @@ void resetTryingToArm();
 void subTaskTelemetryPollSensors(timeUs_t currentTimeUs);
 
 bool isLaunchControlActive(void);
+
+void toUpperCase(char* dest, const char* src, unsigned maxSize);
