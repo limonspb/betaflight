@@ -226,37 +226,42 @@ static void validateAndFixPositionConfig(void)
 void validateKaack(void)
 {
     const char * const toReplace[] = {
-        "kack", "kaack", "kaaack", "kaaaack",
-        "cack", "caack", "caaack", "caaaack",
-        "kak", "kaak", "kaaak", "kaaaak",
-        "kac", "kaac", "kaaac", "kaaaac",
-        "cac", "caac", "caaac", "caaaac",
+        "KACK", "KAACK", "KAAACK", "KAAAACK",
+        "CACK", "CAACK", "CAAACK", "CAAAACK",
+        "KAK", "KAAK", "KAAAK", "KAAAAK",
+        "KAC", "KAAC", "KAAAC", "KAAAAC",
+        "CAC", "CAAC", "CAAAC", "CAAAAC",
     };
 
     const int N = 20;
 
-    char extra100ThrottleLowerCase[MAX_NAME_LENGTH + 1];
-    strcpy(extra100ThrottleLowerCase, pilotConfig()->extra100Throttle);
+    char localExtra100Throttle[MAX_NAME_LENGTH + 1];
+    strcpy(localExtra100Throttle, pilotConfig()->extra100Throttle);
 
-    char* d = extra100ThrottleLowerCase;
-    char* s = extra100ThrottleLowerCase;
+    char* d = localExtra100Throttle;
+    char* s = localExtra100Throttle;
     do {
         while (*d == ' ') {
             ++d;
         }
     } while ((*s++ = *d++) != 0);
 
-    for(int i = 0; extra100ThrottleLowerCase[i]; i++){
-        extra100ThrottleLowerCase[i] = tolower(extra100ThrottleLowerCase[i]);
-    }
-
     for (int i = 0; i < N; i++)
     {
-        if (strcmp(toReplace[i], extra100ThrottleLowerCase) == 0)
+        if (strcmp(toReplace[i], localExtra100Throttle) == 0)
         {
             strcpy(pilotConfigMutable()->extra100Throttle, "NICE");
         }
     }
+}
+
+void makeStringsUpperCase(void)
+{
+    toUpperCase(pilotConfigMutable()->extra100Throttle, pilotConfig()->extra100Throttle, MAX_NAME_LENGTH);
+    toUpperCase(pilotConfigMutable()->extraFcHotWarning, pilotConfig()->extraFcHotWarning, MAX_NAME_LENGTH);
+    toUpperCase(pilotConfigMutable()->extraTurtleModeWarning, pilotConfig()->extraTurtleModeWarning, MAX_NAME_LENGTH);
+    toUpperCase(pilotConfigMutable()->extraLowBatteryWarning, pilotConfig()->extraLowBatteryWarning, MAX_NAME_LENGTH);
+    toUpperCase(pilotConfigMutable()->extraArmedWarning, pilotConfig()->extraArmedWarning, MAX_NAME_LENGTH);
 }
 
 static void validateAndFixConfig(void)
@@ -618,6 +623,7 @@ static void validateAndFixConfig(void)
 #endif
 
     validateAndfixMotorOutputReordering(motorConfigMutable()->dev.motorOutputReordering, MAX_SUPPORTED_MOTORS);
+    makeStringsUpperCase();
     validateKaack();
 
     // validate that the minimum battery cell voltage is less than the maximum cell voltage
