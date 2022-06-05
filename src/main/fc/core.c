@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
 
 #include "platform.h"
 
@@ -1319,4 +1320,17 @@ bool isLaunchControlActive(void)
 #else
     return false;
 #endif
+}
+
+void toUpperCase(char* dest, const char* src, unsigned maxSize)
+{
+    unsigned i;
+    for (i = 0; i < maxSize; i++) {
+        if (src[i]) {
+            dest[i] = toupper((unsigned char)src[i]);
+        } else {
+            break;
+        }
+    }
+    dest[i] = '\0';
 }
