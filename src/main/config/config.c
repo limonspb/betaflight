@@ -246,6 +246,12 @@ void validateKaack(void)
         }
     } while ((*s++ = *d++) != 0);
 
+    for(int i = 0; localExtra100Throttle[i]; i++) {
+        if ('@' == localExtra100Throttle[i]) {
+            localExtra100Throttle[i] = 'A';
+        }
+    }
+
     for (int i = 0; i < N; i++)
     {
         if (strcmp(toReplace[i], localExtra100Throttle) == 0)
