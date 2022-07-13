@@ -111,7 +111,7 @@ PG_REGISTER_WITH_RESET_TEMPLATE(pilotConfig_t, pilotConfig, PG_PILOT_CONFIG, 1);
 PG_RESET_TEMPLATE(pilotConfig_t, pilotConfig,
     .name = { 0 },
     .displayName = { 0 },
-    .extra100Throttle = "FAST",
+    .extra100Throttle = "KAACK",
     .extraFcHotWarning = "B*TCH IS HOT",
     .extraTurtleModeWarning = "SORRY BRYAN",
     .extraLowBatteryWarning = "AINT LEAVING",
@@ -220,44 +220,6 @@ static void validateAndFixPositionConfig(void)
     if (positionConfig()->altNumSatsBaroFallback >= positionConfig()->altNumSatsGpsUse) {
         positionConfigMutable()->altNumSatsGpsUse = POSITION_DEFAULT_ALT_NUM_SATS_GPS_USE;
         positionConfigMutable()->altNumSatsBaroFallback = POSITION_DEFAULT_ALT_NUM_SATS_BARO_FALLBACK;
-    }
-}
-
-void validateKaack(void)
-{
-    const char * const toReplace[] = {
-        "KACK", "KAACK", "KAAACK", "KAAAACK",
-        "CACK", "CAACK", "CAAACK", "CAAAACK",
-        "KAK", "KAAK", "KAAAK", "KAAAAK",
-        "KAC", "KAAC", "KAAAC", "KAAAAC",
-        "CAC", "CAAC", "CAAAC", "CAAAAC",
-    };
-
-    const int N = 20;
-
-    char localExtra100Throttle[MAX_NAME_LENGTH + 1];
-    strcpy(localExtra100Throttle, pilotConfig()->extra100Throttle);
-
-    char* d = localExtra100Throttle;
-    char* s = localExtra100Throttle;
-    do {
-        while (*d == ' ') {
-            ++d;
-        }
-    } while ((*s++ = *d++) != 0);
-
-    for(int i = 0; localExtra100Throttle[i]; i++) {
-        if ('@' == localExtra100Throttle[i]) {
-            localExtra100Throttle[i] = 'A';
-        }
-    }
-
-    for (int i = 0; i < N; i++)
-    {
-        if (strcmp(toReplace[i], localExtra100Throttle) == 0)
-        {
-            strcpy(pilotConfigMutable()->extra100Throttle, "NICE");
-        }
     }
 }
 
@@ -630,7 +592,6 @@ static void validateAndFixConfig(void)
 
     validateAndfixMotorOutputReordering(motorConfigMutable()->dev.motorOutputReordering, MAX_SUPPORTED_MOTORS);
     makeStringsUpperCase();
-    validateKaack();
 
     // validate that the minimum battery cell voltage is less than the maximum cell voltage
     // reset to defaults if not
