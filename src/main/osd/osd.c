@@ -395,6 +395,10 @@ void pgResetFn_osdConfig(osdConfig_t *osdConfig)
 
     osdConfig->cms_background_type = DISPLAY_BACKGROUND_BLACK;
     osdConfig->extra_osd_use_quick_menu = true;
+
+    #ifdef USE_CRAFTNAME_MSGS
+    osdConfig->osd_craftname_msgs = false;   // Insert LQ/RSSI-dBm and warnings into CraftName
+    #endif //USE_CRAFTNAME_MSGS
 }
 
 void pgResetFn_osdElementConfig(osdElementConfig_t *osdElementConfig)
