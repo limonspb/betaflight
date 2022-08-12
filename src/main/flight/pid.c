@@ -195,6 +195,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .d_min_gain = 37,
         .d_min_advance = 20,
         .motor_output_limit = 100,
+        .extra_motor_output_limit_hundredths = 0,
         .auto_profile_cell_count = AUTO_PROFILE_CELL_COUNT_STAY,
         .transient_throttle_limit = 0,
         .profileName = { 0 },

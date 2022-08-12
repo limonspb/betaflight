@@ -43,6 +43,7 @@
 #include "sensors/battery.h"
 
 #include "mixer_init.h"
+#include "common/maths.h"
 
 PG_REGISTER_WITH_RESET_TEMPLATE(mixerConfig_t, mixerConfig, PG_MIXER_CONFIG, 0);
 
@@ -286,7 +287,8 @@ void initEscEndpoints(void)
 {
     float motorOutputLimit = 1.0f;
     if (currentPidProfile->motor_output_limit < 100) {
-        motorOutputLimit = currentPidProfile->motor_output_limit / 100.0f;
+        motorOutputLimit = currentPidProfile->motor_output_limit / 100.0f + currentPidProfile->extra_motor_output_limit_hundredths / 10000.0f;
+        motorOutputLimit = constrainf(motorOutputLimit, 0.0f, 1.0f);
     }
     motorInitEndpoints(motorConfig(), motorOutputLimit, &mixerRuntime.motorOutputLow, &mixerRuntime.motorOutputHigh, &mixerRuntime.disarmMotorOutput, &mixerRuntime.deadbandMotor3dHigh, &mixerRuntime.deadbandMotor3dLow);
 }
