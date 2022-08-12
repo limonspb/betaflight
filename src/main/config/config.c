@@ -293,6 +293,10 @@ static void validateAndFixConfig(void)
             pidProfilesMutable(i)->motor_output_limit = 100;
         }
 
+        if (pidProfilesMutable(i)->extra_motor_output_limit_hundredths >= 100) {
+            pidProfilesMutable(i)->extra_motor_output_limit_hundredths = 0;
+        }
+
         if (pidProfilesMutable(i)->auto_profile_cell_count > MAX_AUTO_DETECT_CELL_COUNT || pidProfilesMutable(i)->auto_profile_cell_count < AUTO_PROFILE_CELL_COUNT_CHANGE) {
             pidProfilesMutable(i)->auto_profile_cell_count = AUTO_PROFILE_CELL_COUNT_STAY;
         }
