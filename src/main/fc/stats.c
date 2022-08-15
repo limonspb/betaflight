@@ -94,8 +94,10 @@ void statsOnDisarm(void)
             statsConfigMutable()->stats_total_dist_m += (DISTANCE_FLOWN_CM - arm_distance_cm) / 100;
         }
 
+#ifdef USE_OSD
         statsConfigMutable()->stats_extra_total_kaacks += osdGetStats()->extra_kaacks;
         statsConfigMutable()->stats_extra_total_kaack_time += (osdGetStats()->extra_kaack_time / 1000000);
+#endif // #ifdef USE_OSD
 
         dispatchAdd(&writeStatsEntry, STATS_SAVE_DELAY_US);
     }
