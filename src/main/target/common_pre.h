@@ -66,7 +66,9 @@
 
 #if defined(STM32F40_41xxx) || defined(STM32F411xE)
 #define USE_OVERCLOCK
+#define MINIMAL_CLI
 #endif
+
 #endif // STM32F4
 
 #ifdef STM32F7
