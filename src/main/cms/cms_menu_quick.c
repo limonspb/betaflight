@@ -64,10 +64,13 @@
 
 #include "cms_menu_quick.h"
 
+#include "sensors/battery.h"
+
 // Features
 
 static controlRateConfig_t rateProfile;
 static uint8_t rateProfileIndex;
+static batteryConfig_t batteryProfile;
 
 static const void *quickMenuOnEnter(displayPort_t *pDisp)
 {
@@ -75,6 +78,7 @@ static const void *quickMenuOnEnter(displayPort_t *pDisp)
 
     rateProfileIndex = getCurrentControlRateProfileIndex();
     memcpy(&rateProfile, controlRateProfiles(rateProfileIndex), sizeof(controlRateConfig_t));
+    memcpy(&batteryProfile, batteryConfigMutable(), sizeof(batteryConfig_t));
 
     // fill variables
     return NULL;
@@ -86,6 +90,7 @@ static const void *cmsx_RateProfileWriteback(displayPort_t *pDisp, const OSD_Ent
     UNUSED(self);
 
     memcpy(controlRateProfilesMutable(rateProfileIndex), &rateProfile, sizeof(controlRateConfig_t));
+        memcpy(batteryConfigMutable(), &batteryProfile, sizeof(batteryConfig_t));
 
     return NULL;
 }
@@ -101,6 +106,7 @@ static const OSD_Entry menuMainEntries[] =
 
     { "THR LIM TYPE",OME_TAB,    NULL, &(OSD_TAB_t)   { &rateProfile.throttle_limit_type, THROTTLE_LIMIT_TYPE_COUNT - 1, osdTableThrottleLimitType} },
     { "THR LIM %",   OME_UINT8,  NULL, &(OSD_UINT8_t) { &rateProfile.throttle_limit_percent, 25,  100,  1} },
+    { "FORCE CELLS",   OME_UINT8,  NULL, &(OSD_UINT8_t) { &batteryProfile.forceBatteryCellCount, 0, 24, 1} },
 #if defined(USE_VTX_CONTROL)
 #if defined(USE_VTX_RTC6705) || defined(USE_VTX_SMARTAUDIO) || defined(USE_VTX_TRAMP)
     {"VTX", OME_Funcall, cmsSelectVtx, NULL},
@@ -108,7 +114,7 @@ static const OSD_Entry menuMainEntries[] =
 #endif // VTX_CONTROL
     {"MAIN",     OME_Submenu,  NULL, &cmsx_menuMain},
     { "EXIT",            OME_OSD_Exit, cmsMenuExit,   (void *)CMS_EXIT},
-    { "SAVE&EXIT",       OME_OSD_Exit, cmsMenuExit,   (void *)CMS_POPUP_SAVE},
+    { "SAVE&REBOOT",     OME_OSD_Exit, cmsMenuExit,   (void *)CMS_POPUP_SAVEREBOOT},
     {NULL, OME_END, NULL, NULL},
 };
 
