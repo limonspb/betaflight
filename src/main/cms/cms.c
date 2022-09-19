@@ -844,7 +844,7 @@ const void *cmsMenuChange(displayPort_t *pDisplay, const void *ptr)
     if (pMenu != currentCtx.menu) {
         saveMenuInhibited = false;
 
-        if (currentCtx.menu) {
+        if (currentCtx.menu && pMenu != &cmsx_menuMain) {
             // If we are opening the initial top-level menu, then currentCtx.menu will be NULL and nothing to do.
             // Otherwise stack the current menu before moving to the selected menu.
             if (menuStackIdx >= CMS_MENU_STACK_LIMIT - 1) {
