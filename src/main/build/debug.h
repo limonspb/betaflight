@@ -99,6 +99,7 @@ typedef enum {
     DEBUG_RX_EXPRESSLRS_PHASELOCK,
     DEBUG_RX_STATE_TIME,
     DEBUG_VTX_MSP,
+    DEBUG_RPM_LIMITER,
     DEBUG_COUNT
 } debugType_e;
 
