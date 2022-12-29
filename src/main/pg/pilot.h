@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of Betaflight.
  *
  * Betaflight is free software. You can redistribute this software
@@ -29,6 +29,11 @@
 typedef struct pilotConfig_s {
     char craftName[MAX_NAME_LENGTH + 1];
     char pilotName[MAX_NAME_LENGTH + 1];
+    char extra100Throttle[MAX_NAME_LENGTH + 1];
+    char extraFcHotWarning[MAX_NAME_LENGTH + 1];
+    char extraTurtleModeWarning[MAX_NAME_LENGTH + 1];
+    char extraLowBatteryWarning[MAX_NAME_LENGTH + 1];
+    char extraArmedWarning[MAX_NAME_LENGTH + 1];
     char message[OSD_CUSTOM_MSG_COUNT][MAX_NAME_LENGTH + 1];
 } pilotConfig_t;
 
