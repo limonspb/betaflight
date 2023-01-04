@@ -872,6 +872,10 @@ void changePidProfile(uint8_t pidProfileIndex)
     beeperConfirmationBeeps(pidProfileIndex + 1);
 }
 
+void updateRPMLimiterExpectedThrottleLimit(void) {
+    mixerInitProfile();
+}
+
 bool isSystemConfigured(void)
 {
     return systemConfig()->configurationState == CONFIGURATION_STATE_CONFIGURED;
