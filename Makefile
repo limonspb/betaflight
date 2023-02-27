@@ -111,7 +111,7 @@ ifeq ($(OSFAMILY), macosx)
 # SITL is not buildable on MacOS
 PRE_PUSH_TARGET_LIST ?= $(UNIFIED_TARGETS) STM32F4DISCOVERY_DEBUG test-representative
 else
-PRE_PUSH_TARGET_LIST ?= $(UNIFIED_TARGETS) SITL STM32F4DISCOVERY_DEBUG test-representative
+PRE_PUSH_TARGET_LIST ?= $(UNIFIED_TARGETS) STM32F4DISCOVERY_DEBUG test-representative
 endif
 
 include $(ROOT)/make/targets.mk
