@@ -422,3 +422,11 @@ extern uint8_t __config_end;
 #ifndef USE_GPS
 #undef USE_GPS_PLUS_CODES
 #endif
+
+#ifdef USE_ACRO_TRAINER
+#undef USE_ACRO_TRAINER
+#endif
+
+#ifdef USE_OSD_STICK_OVERLAY
+#undef USE_OSD_STICK_OVERLAY
+#endif
