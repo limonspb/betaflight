@@ -399,7 +399,7 @@ static void applyRPMLimiter(mixerRuntime_t *mixer)
         // Output
         pidOutput = MAX(0.0f, pidOutput);
         if (mixerConfig()->rpmLimiterUseMaxRPM) {
-            motorRangeMax = constrainf(throttle-pidOutput, 0.0f, 1.0f);
+            motorRangeMax = constrainf(motorRangeMax-pidOutput, 0.0f, 1.0f);
         } else {
             throttle = constrainf(throttle-pidOutput, 0.0f, 1.0f);
         }
