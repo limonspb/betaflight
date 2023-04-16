@@ -46,7 +46,7 @@ static const void *cmsx_RpmLimit_onEnter(displayPort_t *pDisp)
     UNUSED(pDisp);
 
     rpm_limiter_rpm_limit = mixerConfig()->rpm_limiter_rpm_limit;
-    motor_kv = mixerConfig()->motor_kv;
+    motor_kv = motorConfig()->kv;
     rpm_limiter = mixerConfig()->rpm_limiter;
 
     return NULL;
@@ -58,7 +58,7 @@ static const void *cmsx_RpmLimit_onExit(displayPort_t *pDisp, const OSD_Entry *s
     UNUSED(self);
 
     mixerConfigMutable()->rpm_limiter_rpm_limit = rpm_limiter_rpm_limit;
-    mixerConfigMutable()->motor_kv = motor_kv;
+    motorConfigMutable()->kv = motor_kv;
     mixerConfigMutable()->rpm_limiter = rpm_limiter;
 
     return NULL;
