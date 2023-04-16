@@ -110,6 +110,7 @@ typedef enum {
     DEBUG_ANGLE_MODE,
     DEBUG_ANGLE_TARGET,
     DEBUG_CURRENT_ANGLE,
+    DEBUG_RPM_LIMITER,
     DEBUG_COUNT
 } debugType_e;
 
