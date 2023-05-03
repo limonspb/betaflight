@@ -1174,7 +1174,7 @@ static timeDelta_t osdShowArmed(void)
         ret = (REFRESH_1S / 2);
     }
 
-    displayWrite(osdDisplayPort, midCol - (strlen(pilotConfig()->extraArmedWarning) / 2), midRow, DISPLAYPORT_ATTR_NORMAL, pilotConfig()->extraArmedWarning);
+    displayWrite(osdDisplayPort, midCol - (strlen(pilotConfig()->extraArmedWarning) / 2), midRow, DISPLAYPORT_SEVERITY_NORMAL, pilotConfig()->extraArmedWarning);
 
     if (isFlipOverAfterCrashActive()) {
         displayWrite(osdDisplayPort, midCol - (strlen(CRASH_FLIP_WARNING) / 2), midRow + 1, DISPLAYPORT_SEVERITY_NORMAL, CRASH_FLIP_WARNING);
