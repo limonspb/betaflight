@@ -1513,19 +1513,19 @@ static void osdElementStickOverlay(osdElementParms_t *element)
 
 static void osdElementThrottlePosition(osdElementParms_t *element)
 {
-    static bool previousKaack = false;
+    static bool previousquack = false;
 
     const uint8_t throttleValue = calculateThrottlePercent();
 
     if (ARMING_FLAG(ARMED)) {
         if (100 == throttleValue) {
-            if (!previousKaack) {
-                osdGetStats()->extra_kaacks++;
+            if (!previousquack) {
+                osdGetStats()->extra_quacks++;
             }
 
-            previousKaack = true;
+            previousquack = true;
         } else {
-            previousKaack = false;
+            previousquack = false;
         }
     }
 

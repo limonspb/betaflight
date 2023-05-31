@@ -193,10 +193,10 @@ const osd_stats_e osdStatsDisplayOrder[OSD_STAT_COUNT] = {
     OSD_STAT_TOTAL_TIME,
     OSD_STAT_TOTAL_DIST,
     OSD_STAT_WATT_HOURS_DRAWN,
-    OSD_STAT_EXTRA_KAACK,
-    OSD_STAT_EXTRA_KAACK_TOTAL,
-    OSD_STAT_EXTRA_KAACK_TIME,
-    OSD_STAT_EXTRA_KAACK_TIME_TOTAL,
+    OSD_STAT_EXTRA_QUACK,
+    OSD_STAT_EXTRA_QUACK_TOTAL,
+    OSD_STAT_EXTRA_QUACK_TIME,
+    OSD_STAT_EXTRA_QUACK_TIME_TOTAL,
     OSD_STAT_EXTRA_AVG_THROTTLE
 };
 
@@ -338,10 +338,10 @@ void pgResetFn_osdConfig(osdConfig_t *osdConfig)
     osdStatSetState(OSD_STAT_MIN_BATTERY, true);
     osdStatSetState(OSD_STAT_MIN_LINK_QUALITY, true);
     osdStatSetState(OSD_STAT_TOTAL_FLIGHTS, true);
-    osdStatSetState(OSD_STAT_EXTRA_KAACK, true);
-    osdStatSetState(OSD_STAT_EXTRA_KAACK_TOTAL, true);
-    osdStatSetState(OSD_STAT_EXTRA_KAACK_TIME, true);
-    osdStatSetState(OSD_STAT_EXTRA_KAACK_TIME_TOTAL, true);
+    osdStatSetState(OSD_STAT_EXTRA_QUACK, true);
+    osdStatSetState(OSD_STAT_EXTRA_QUACK_TOTAL, true);
+    osdStatSetState(OSD_STAT_EXTRA_QUACK_TIME, true);
+    osdStatSetState(OSD_STAT_EXTRA_QUACK_TIME_TOTAL, true);
     osdStatSetState(OSD_STAT_EXTRA_AVG_THROTTLE, true);
 
     osdConfig->units = UNIT_METRIC;
@@ -570,8 +570,8 @@ static void osdResetStats(void)
     stats.min_link_quality = (linkQualitySource == LQ_SOURCE_NONE) ? 99 : 100; // percent
     stats.min_rssi_dbm = CRSF_RSSI_MAX;
     stats.min_rsnr = CRSF_SNR_MAX;
-    stats.extra_kaacks = 0;
-    stats.extra_kaack_time = 0;
+    stats.extra_quacks = 0;
+    stats.extra_quack_time = 0;
     stats.extra_throttle_sum = 0;
     stats.extra_throttle_count = 0;
 }
@@ -987,34 +987,34 @@ static bool osdDisplayStat(int statistic, uint8_t displayRow)
         osdDisplayStatisticLabel(midCol, displayRow, "TOTAL DISTANCE", buff);
         return true;
 #endif
-    case OSD_STAT_EXTRA_KAACK:
-        itoa(stats.extra_kaacks, buff, 10);
-        osdDisplayStatisticLabel(midCol, displayRow, "KAACKS", buff);
+    case OSD_STAT_EXTRA_QUACK:
+        itoa(stats.extra_quacks, buff, 10);
+        osdDisplayStatisticLabel(midCol, displayRow, "QUACKS", buff);
         return true;
-    case OSD_STAT_EXTRA_KAACK_TOTAL:
-        itoa(statsConfig()->stats_extra_total_kaacks, buff, 10);
-        osdDisplayStatisticLabel(midCol, displayRow, "TOTAL KAACKS", buff);
+    case OSD_STAT_EXTRA_QUACK_TOTAL:
+        itoa(statsConfig()->stats_extra_total_quacks, buff, 10);
+        osdDisplayStatisticLabel(midCol, displayRow, "TOTAL QUACKS", buff);
         return true;
 
-    case OSD_STAT_EXTRA_KAACK_TIME:
+    case OSD_STAT_EXTRA_QUACK_TIME:
         {
-            int seconds = stats.extra_kaack_time / 1000000;
+            int seconds = stats.extra_quack_time / 1000000;
             const int minutes = seconds / 60;
             seconds = seconds % 60;
             tfp_sprintf(buff, "%02d:%02d", minutes, seconds);
         }
 
-        osdDisplayStatisticLabel(midCol, displayRow, "KAACK TIME", buff);
+        osdDisplayStatisticLabel(midCol, displayRow, "QUACK TIME", buff);
         return true;
-    case OSD_STAT_EXTRA_KAACK_TIME_TOTAL:
+    case OSD_STAT_EXTRA_QUACK_TIME_TOTAL:
         {
-            int seconds = statsConfig()->stats_extra_total_kaack_time;
+            int seconds = statsConfig()->stats_extra_total_quack_time;
             const int minutes = seconds / 60;
             seconds = seconds % 60;
             tfp_sprintf(buff, "%02d:%02d", minutes, seconds);
         }
 
-        osdDisplayStatisticLabel(midCol, displayRow, "TOTAL KAACK TIME", buff);
+        osdDisplayStatisticLabel(midCol, displayRow, "TOTAL QUACK TIME", buff);
         return true;
     case OSD_STAT_EXTRA_AVG_THROTTLE:
         itoa(stats.extra_throttle_sum / stats.extra_throttle_count, buff, 10);
@@ -1226,7 +1226,7 @@ STATIC_UNIT_TESTED bool osdProcessStats1(timeUs_t currentTimeUs)
         stats.extra_throttle_sum += throttleValue;
 
         if (100 == throttleValue) {
-            stats.extra_kaack_time += deltaT;
+            stats.extra_quack_time += deltaT;
         }
 
     } else if (osdStatsEnabled) {  // handle showing/hiding stats based on OSD disable switch position

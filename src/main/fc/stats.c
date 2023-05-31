@@ -101,8 +101,8 @@ void statsOnDisarm(void)
         }
 
 #ifdef USE_OSD
-        statsConfigMutable()->stats_extra_total_kaacks += osdGetStats()->extra_kaacks;
-        statsConfigMutable()->stats_extra_total_kaack_time += (osdGetStats()->extra_kaack_time / 1000000);
+        statsConfigMutable()->stats_extra_total_quacks += osdGetStats()->extra_quacks;
+        statsConfigMutable()->stats_extra_total_quack_time += (osdGetStats()->extra_quack_time / 1000000);
 #endif // #ifdef USE_OSD
 
         dispatchAdd(&writeStatsEntry, STATS_SAVE_DELAY_US);
