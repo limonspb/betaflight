@@ -34,6 +34,10 @@ typedef struct pilotConfig_s {
     char extraTurtleModeWarning[MAX_NAME_LENGTH + 1];
     char extraLowBatteryWarning[MAX_NAME_LENGTH + 1];
     char extraArmedWarning[MAX_NAME_LENGTH + 1];
+    char extraLandNowWarning[MAX_NAME_LENGTH + 1];
+    char extraPrearm1[MAX_NAME_LENGTH + 1];
+    char extraPrearm2[MAX_NAME_LENGTH + 1];
+    char extraPrearm3[MAX_NAME_LENGTH + 1];
     char message[OSD_CUSTOM_MSG_COUNT][MAX_NAME_LENGTH + 1];
 } pilotConfig_t;
 
