@@ -44,7 +44,7 @@
 // Symbol rate [symbol/sec]
 #define MOTOR_DSHOT600_SYMBOL_RATE     (600 * 1000)
 #define MOTOR_DSHOT300_SYMBOL_RATE     (300 * 1000)
-#define MOTOR_DSHOT150_SYMBOL_RATE     (150 * 1000)
+#define MOTOR_DSHOT150_SYMBOL_RATE     (2400 * 1000)
 
 #define MOTOR_DSHOT_SYMBOL_TIME_NS(rate)  (1000000000 / (rate))
 
@@ -219,7 +219,7 @@ extern uint32_t bbOutputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTE
 // <slack> = 10%
 // (30 + 26 + 3) / 0.44 = 134
 // In some cases this was not enough, so we add 6 extra samples
-#define DSHOT_BB_PORT_IP_BUF_LENGTH 140
+#define DSHOT_BB_PORT_IP_BUF_LENGTH 560
 #ifdef USE_DSHOT_CACHE_MGMT
 // Each sample is a uint16_t
 // Number of bytes required for buffer

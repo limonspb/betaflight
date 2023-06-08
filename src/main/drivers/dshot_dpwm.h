@@ -27,7 +27,7 @@
 
 #define MOTOR_DSHOT600_HZ     MHZ_TO_HZ(12)
 #define MOTOR_DSHOT300_HZ     MHZ_TO_HZ(6)
-#define MOTOR_DSHOT150_HZ     MHZ_TO_HZ(3)
+#define MOTOR_DSHOT150_HZ     MHZ_TO_HZ(48)
 
 #define MOTOR_BIT_0           7
 #define MOTOR_BIT_1           14
