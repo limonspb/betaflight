@@ -110,4 +110,7 @@ const char * const debugModeNames[DEBUG_COUNT] = {
     "FAILSAFE",
     "DSHOT_TELEMETRY_COUNTS",
     "RPM_LIMIT",
+    "LLC_GYRO",
+    "LLC_PTERM",
+    "LLC_DTERM",
 };

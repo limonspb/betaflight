@@ -124,6 +124,10 @@ PG_REGISTER_ARRAY_WITH_RESET_FN(pidProfile_t, PID_PROFILE_COUNT, pidProfiles, PG
 void resetPidProfile(pidProfile_t *pidProfile)
 {
     RESET_CONFIG(pidProfile_t, pidProfile,
+        .dterm_llc_freq_hz = 100,
+        .dterm_llc_phase = 0,
+        .pterm_llc_freq_hz = 100,
+        .pterm_llc_phase = 0,
         .pid = {
             [PID_ROLL] =  PID_ROLL_DEFAULT,
             [PID_PITCH] = PID_PITCH_DEFAULT,
@@ -1010,6 +1014,15 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
         if (axis == FD_YAW) {
             pidData[axis].P = pidRuntime.ptermYawLowpassApplyFn((filter_t *) &pidRuntime.ptermYawLowpass, pidData[axis].P);
         }
+        if (axis == gyro.gyroDebugAxis) {
+            DEBUG_SET(DEBUG_LLC_PTERM, 0, lrintf(pidData[axis].P * 100.0f));
+        }
+        if (pidProfile->pterm_llc_phase != 0) {
+            pidData[axis].P = phaseCompApply(&pidRuntime.llcP[axis], pidData[axis].P);
+        }
+        if (axis == gyro.gyroDebugAxis) {
+            DEBUG_SET(DEBUG_LLC_PTERM, 1, lrintf(pidData[axis].P * 100.0f));
+        }
 
         // -----calculate I component
         float Ki = pidRuntime.pidCoefficient[axis].Ki;
@@ -1046,6 +1059,17 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
             const float delta =
                 - (gyroRateDterm[axis] - previousGyroRateDterm[axis]) * pidRuntime.pidFrequency;
             float preTpaD = pidRuntime.pidCoefficient[axis].Kd * delta;
+
+            if (axis == gyro.gyroDebugAxis) {
+                DEBUG_SET(DEBUG_LLC_DTERM, 0, lrintf(delta * 100.0f));
+                DEBUG_SET(DEBUG_LLC_DTERM, 1, lrintf(preTpaD * 100.0f));
+            }
+            if (pidProfile->dterm_llc_phase != 0) {
+                preTpaD = phaseCompApply(&pidRuntime.llcD[axis], preTpaD);
+            }
+            if (axis == gyro.gyroDebugAxis) {
+                DEBUG_SET(DEBUG_LLC_DTERM, 2, lrintf(preTpaD * 100.0f));
+            }
 
 #if defined(USE_ACC)
             if (cmpTimeUs(currentTimeUs, levelModeStartTimeUs) > CRASH_RECOVERY_DETECTION_DELAY_US) {
