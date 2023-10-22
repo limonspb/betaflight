@@ -293,11 +293,15 @@ void pidUpdateTpaFactor(float throttle)
     } else {
         tpaRate = pidRuntime.tpaLowMultiplier * (pidRuntime.tpaLowBreakpoint - throttle);
     }
-    if (currentPidProfile->tpa_cutoff_hz) {
-        tpaRate = pt2FilterApply(&pidRuntime.tpaLpf, tpaRate);
-    }
 
     pidRuntime.tpaFactor = 1.0f - tpaRate;
+    DEBUG_SET(DEBUG_TPA, 0, lrintf(pidRuntime.tpaFactor * 1000));
+
+    if (currentPidProfile->tpa_cutoff_hz) {
+        pidRuntime.tpaFactor = pt2FilterApply(&pidRuntime.tpaLpf, pidRuntime.tpaFactor);
+    }
+
+    DEBUG_SET(DEBUG_TPA, 1, lrintf(pidRuntime.tpaFactor * 1000));
 }
 
 void pidUpdateAntiGravityThrottleFilter(float throttle)
