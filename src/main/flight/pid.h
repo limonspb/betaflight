@@ -245,6 +245,7 @@ typedef struct pidProfile_s {
     uint8_t ez_landing_threshold;           // Threshold stick position below which motor output is limited
     uint8_t ez_landing_limit;               // Maximum motor output when all sticks centred and throttle zero
     uint8_t ez_landing_speed;               // Speed below which motor output is limited
+    uint16_t tpa_cutoff_hz;
 } pidProfile_t;
 
 PG_DECLARE_ARRAY(pidProfile_t, PID_PROFILE_COUNT, pidProfiles);
@@ -299,6 +300,7 @@ typedef struct pidRuntime_s {
     pt1Filter_t ptermYawLowpass;
     bool antiGravityEnabled;
     pt2Filter_t antiGravityLpf;
+    pt2Filter_t tpaLpf;
     float antiGravityOsdCutoff;
     float antiGravityThrottleD;
     float itermAccelerator;

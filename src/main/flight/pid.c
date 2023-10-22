@@ -230,6 +230,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .ez_landing_threshold = 25,
         .ez_landing_limit = 15,
         .ez_landing_speed = 50,
+        .tpa_cutoff_hz = 100.0,
     );
 
 #ifndef USE_D_MIN
@@ -292,6 +293,10 @@ void pidUpdateTpaFactor(float throttle)
     } else {
         tpaRate = pidRuntime.tpaLowMultiplier * (pidRuntime.tpaLowBreakpoint - throttle);
     }
+    if (isFixedWing()) {
+        tpaRate = pt2FilterApply(&pidRuntime.tpaLpf, tpaRate);
+    }
+
     pidRuntime.tpaFactor = 1.0f - tpaRate;
 }
 
