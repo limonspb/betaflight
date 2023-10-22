@@ -308,11 +308,15 @@ void pidUpdateTpaFactor(float throttle)
     } else {
         tpaRate = 0.0f;
     }
-    if (currentPidProfile->tpa_cutoff_hz) {
-        tpaRate = pt2FilterApply(&pidRuntime.tpaLpf, tpaRate);
-    }
 
     pidRuntime.tpaFactor = 1.0f - tpaRate;
+    DEBUG_SET(DEBUG_TPA, 0, lrintf(pidRuntime.tpaFactor * 1000));
+
+    if (currentPidProfile->tpa_cutoff_hz) {
+        pidRuntime.tpaFactor = pt2FilterApply(&pidRuntime.tpaLpf, pidRuntime.tpaFactor);
+    }
+
+    DEBUG_SET(DEBUG_TPA, 1, lrintf(pidRuntime.tpaFactor * 1000));
 }
 
 void pidUpdateAntiGravityThrottleFilter(float throttle)
@@ -320,7 +324,7 @@ void pidUpdateAntiGravityThrottleFilter(float throttle)
     static float previousThrottle = 0.0f;
     const float throttleInv = 1.0f - throttle;
     float throttleDerivative = fabsf(throttle - previousThrottle) * pidRuntime.pidFrequency;
-    DEBUG_SET(DEBUG_ANTI_GRAVITY, 0, lrintf(throttleDerivative * 100)); 
+    DEBUG_SET(DEBUG_ANTI_GRAVITY, 0, lrintf(throttleDerivative * 100));
     throttleDerivative *= throttleInv * throttleInv;
     // generally focus on the low throttle period
     if (throttle > previousThrottle) {

@@ -108,6 +108,7 @@ typedef enum {
     DEBUG_FAILSAFE,
     DEBUG_DSHOT_TELEMETRY_COUNTS,
     DEBUG_RPM_LIMIT,
+    DEBUG_TPA,
     DEBUG_COUNT
 } debugType_e;
 
