@@ -802,9 +802,13 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
     static float previousRawGyroRateDterm[XYZ_AXIS_COUNT];
 
 #ifdef USE_TPA_MODE
-    const float tpaFactorKp = (pidProfile->tpa_mode == TPA_MODE_PD) ? pidRuntime.tpaFactor : 1.0f;
+    const float tpaFactorKp = (pidProfile->tpa_mode == TPA_MODE_PD || pidProfile->tpa_mode == TPA_MODE_PIDF) ? pidRuntime.tpaFactor : 1.0f;
+    const float tpaFactorKi = (pidProfile->tpa_mode == TPA_MODE_PIDF) ? pidRuntime.tpaFactor : 1.0f;
+    const float tpaFactorKf = (pidProfile->tpa_mode == TPA_MODE_PIDF) ? pidRuntime.tpaFactor : 1.0f;
 #else
     const float tpaFactorKp = pidRuntime.tpaFactor;
+    const float tpaFactorKi = 1.0;
+    const float tpaFactorKf = 1.0;
 #endif
 
 #ifdef USE_YAW_SPIN_RECOVERY
@@ -998,7 +1002,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
             }
         }
         const float iTermChange = (Ki + pidRuntime.itermAccelerator) * dynCi * pidRuntime.dT * itermErrorRate;
-        pidData[axis].I = constrainf(previousIterm + iTermChange, -pidRuntime.itermLimit, pidRuntime.itermLimit);
+        pidData[axis].I = constrainf((previousIterm + iTermChange) * tpaFactorKi, -pidRuntime.itermLimit * tpaFactorKi, pidRuntime.itermLimit * tpaFactorKi);
 
         // -----calculate D component
 
@@ -1087,6 +1091,8 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
         // no feedforward in launch control
         const float feedforwardGain = launchControlActive ? 0.0f : pidRuntime.pidCoefficient[axis].Kf;
         pidData[axis].F = feedforwardGain * pidSetpointDelta;
+
+        pidData[axis].F = pidData[axis].F * tpaFactorKf;
 
 #ifdef USE_YAW_SPIN_RECOVERY
         if (yawSpinActive) {

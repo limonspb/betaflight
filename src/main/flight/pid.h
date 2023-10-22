@@ -72,7 +72,8 @@
 
 typedef enum {
     TPA_MODE_PD,
-    TPA_MODE_D
+    TPA_MODE_D,
+    TPA_MODE_PIDF
 } tpaMode_e;
 
 typedef enum {
