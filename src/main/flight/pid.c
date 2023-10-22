@@ -308,7 +308,7 @@ void pidUpdateTpaFactor(float throttle)
     } else {
         tpaRate = 0.0f;
     }
-    if (isFixedWing()) {
+    if (currentPidProfile->tpa_cutoff_hz) {
         tpaRate = pt2FilterApply(&pidRuntime.tpaLpf, tpaRate);
     }
 
