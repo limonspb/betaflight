@@ -231,6 +231,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .ez_landing_limit = 15,
         .ez_landing_speed = 50,
         .tpa_cutoff_hz = 100.0,
+        .tpa_cutoff_hz = 0,
     );
 
 #ifndef USE_D_MIN
