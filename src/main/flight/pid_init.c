@@ -257,7 +257,10 @@ void pidInitFilters(const pidProfile_t *pidProfile)
 #endif
 
     pt2FilterInit(&pidRuntime.antiGravityLpf, pt2FilterGain(pidProfile->anti_gravity_cutoff_hz, pidRuntime.dT));
-    pt2FilterInit(&pidRuntime.tpaLpf, pt2FilterGain(pidProfile->tpa_cutoff_hz / 100.0, pidRuntime.dT));
+
+    if (pidProfile->tpa_cutoff_hz){
+        pt2FilterInit(&pidRuntime.tpaLpf, pt2FilterGain(pidProfile->tpa_cutoff_hz / 1000.0, pidRuntime.dT));
+    }
 }
 
 void pidInit(const pidProfile_t *pidProfile)
