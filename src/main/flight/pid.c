@@ -223,7 +223,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .tpa_mode = TPA_MODE_D,
         .tpa_rate = 65,
         .tpa_breakpoint = 1350,
-        .tpa_cutoff_hz = 100.0,
+        .tpa_cutoff_hz = 0,
     );
 
 #ifndef USE_D_MIN
