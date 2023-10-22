@@ -223,6 +223,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .tpa_mode = TPA_MODE_D,
         .tpa_rate = 65,
         .tpa_breakpoint = 1350,
+        .tpa_cutoff_hz = 100.0,
     );
 
 #ifndef USE_D_MIN
@@ -307,6 +308,10 @@ void pidUpdateTpaFactor(float throttle)
     } else {
         tpaRate = 0.0f;
     }
+    if (isFixedWing()) {
+        tpaRate = pt2FilterApply(&pidRuntime.tpaLpf, tpaRate);
+    }
+
     pidRuntime.tpaFactor = 1.0f - tpaRate;
 }
 
