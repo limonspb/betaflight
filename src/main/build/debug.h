@@ -109,6 +109,7 @@ typedef enum {
     DEBUG_DSHOT_TELEMETRY_COUNTS,
     DEBUG_RPM_LIMIT,
     DEBUG_TPA,
+    DEBUG_S_TERM,
     DEBUG_COUNT
 } debugType_e;
 

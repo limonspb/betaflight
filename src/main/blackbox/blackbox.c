@@ -1410,6 +1410,11 @@ static bool blackboxWriteSysinfo(void)
         BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_ACC_LIMIT, "%d",              currentPidProfile->rateAccelLimit);
         BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_PIDSUM_LIMIT, "%d",           currentPidProfile->pidSumLimit);
         BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_PIDSUM_LIMIT_YAW, "%d",       currentPidProfile->pidSumLimitYaw);
+
+        BLACKBOX_PRINT_HEADER_LINE("s_roll",  "%d", currentPidProfile->pid[PID_ROLL]  .S);
+        BLACKBOX_PRINT_HEADER_LINE("s_pitch", "%d", currentPidProfile->pid[PID_PITCH] .S);
+        BLACKBOX_PRINT_HEADER_LINE("s_yaw",   "%d", currentPidProfile->pid[PID_YAW]   .S);
+
         // End of Betaflight controller parameters
 
         BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_DEADBAND, "%d",               rcControlsConfig()->deadband);
