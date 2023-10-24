@@ -112,6 +112,10 @@ typedef struct gyro_s {
     filterApplyFnPtr notchFilter2ApplyFn;
     biquadFilter_t notchFilter2[XYZ_AXIS_COUNT];
 
+    // lpf filters separate for roll pitch and yaw
+    filterApplyFnPtr lowpassRPYFilterApplyFn[XYZ_AXIS_COUNT];
+    gyroLowpassFilter_t lowpassRPYFilter[XYZ_AXIS_COUNT];
+
     uint16_t accSampleRateHz;
     uint8_t gyroToUse;
     uint8_t gyroDebugMode;
@@ -161,7 +165,10 @@ typedef enum {
 
 enum {
     FILTER_LPF1 = 0,
-    FILTER_LPF2
+    FILTER_LPF2,
+    FILTER_ROLL_LPF,
+    FILTER_PITCH_LPF,
+    FILTER_YAW_LPF,
 };
 
 typedef struct gyroConfig_s {
@@ -198,6 +205,9 @@ typedef struct gyroConfig_s {
     uint8_t gyro_lpf1_dyn_expo; // set the curve for dynamic gyro lowpass filter
     uint8_t simplified_gyro_filter;
     uint8_t simplified_gyro_filter_multiplier;
+
+    uint16_t gyro_rpy_lpf_static_hz[XYZ_AXIS_COUNT];
+    uint8_t gyro_rpy_lpf_type[XYZ_AXIS_COUNT];
 } gyroConfig_t;
 
 PG_DECLARE(gyroConfig_t, gyroConfig);

@@ -25,6 +25,14 @@
 #define PARAM_NAME_GYRO_LPF1_STATIC_HZ "gyro_lpf1_static_hz"
 #define PARAM_NAME_GYRO_LPF2_TYPE "gyro_lpf2_type"
 #define PARAM_NAME_GYRO_LPF2_STATIC_HZ "gyro_lpf2_static_hz"
+#define PARAM_NAME_GYRO_ROLL_LPF_STATIC_HZ "gyro_roll_lpf_static_hz"
+#define PARAM_NAME_GYRO_PITCH_LPF_STATIC_HZ "gyro_pitch_lpf_static_hz"
+#define PARAM_NAME_GYRO_YAW_LPF_STATIC_HZ "gyro_yaw_lpf_static_hz"
+
+#define PARAM_NAME_GYRO_ROLL_LPF_TYPE "gyro_roll_lpf_type"
+#define PARAM_NAME_GYRO_PITCH_LPF_TYPE "gyro_pitch_lpf_type"
+#define PARAM_NAME_GYRO_YAW_LPF_TYPE "gyro_yaw_lpf_type"
+
 #define PARAM_NAME_GYRO_TO_USE "gyro_to_use"
 #define PARAM_NAME_DYN_NOTCH_MAX_HZ "dyn_notch_max_hz"
 #define PARAM_NAME_DYN_NOTCH_COUNT "dyn_notch_count"

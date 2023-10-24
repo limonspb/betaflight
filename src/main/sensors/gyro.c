@@ -131,6 +131,12 @@ void pgResetFn_gyroConfig(gyroConfig_t *gyroConfig)
     gyroConfig->gyro_lpf1_dyn_expo = 5;
     gyroConfig->simplified_gyro_filter = true;
     gyroConfig->simplified_gyro_filter_multiplier = SIMPLIFIED_TUNING_DEFAULT;
+
+
+    for (int x = 0; x < XYZ_AXIS_COUNT; x++) {
+        gyroConfig->gyro_rpy_lpf_static_hz[x] = 0;
+        gyroConfig->gyro_rpy_lpf_type[x] = FILTER_PT1;        
+    }
 }
 
 bool isGyroSensorCalibrationComplete(const gyroSensor_t *gyroSensor)
@@ -443,6 +449,11 @@ FAST_CODE void gyroUpdate(void)
         gyro.sampleSum[Y] += gyro.gyroADC[Y];
         gyro.sampleSum[Z] += gyro.gyroADC[Z];
         gyro.sampleCount++;
+    }
+
+    for (int x = 0; x < XYZ_AXIS_COUNT; x++) {
+        if (gyroConfig()->gyro_rpy_lpf_static_hz[x])
+        gyro.sampleSum[x] = gyro.lowpassRPYFilterApplyFn[x]((filter_t *)&gyro.lowpassRPYFilter[x], gyro.sampleSum[x]);
     }
 }
 

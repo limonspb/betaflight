@@ -152,6 +152,22 @@ static bool gyroInitLowpassFilterLpf(int slot, int type, uint16_t lpfHz, uint32_
         lowpassFilter = gyro.lowpass2Filter;
         break;
 
+    case FILTER_ROLL_LPF:
+        lowpassFilterApplyFn = &gyro.lowpassRPYFilterApplyFn[X];
+        lowpassFilter = &gyro.lowpassRPYFilter[X];
+        break;
+
+    case FILTER_PITCH_LPF:
+        lowpassFilterApplyFn = &gyro.lowpassRPYFilterApplyFn[Y];
+        lowpassFilter = &gyro.lowpassRPYFilter[Y];
+        break;
+
+    case FILTER_YAW_LPF:
+        lowpassFilterApplyFn = &gyro.lowpassRPYFilterApplyFn[Z];
+        lowpassFilter = &gyro.lowpassRPYFilter[Z];
+        break;
+
+
     default:
         return false;
     }
@@ -264,6 +280,15 @@ void gyroInitFilters(void)
       gyroConfig()->gyro_lpf2_static_hz,
       gyro.sampleLooptime
     );
+
+    for (int x = 0; x < XYZ_AXIS_COUNT; x++) {
+        gyroInitLowpassFilterLpf(
+          FILTER_ROLL_LPF + x,
+          gyroConfig()->gyro_rpy_lpf_type[x],
+          gyroConfig()->gyro_rpy_lpf_static_hz[x],
+          gyro.targetLooptime
+        );    
+    }
 
     gyroInitFilterNotch1(gyroConfig()->gyro_soft_notch_hz_1, gyroConfig()->gyro_soft_notch_cutoff_1);
     gyroInitFilterNotch2(gyroConfig()->gyro_soft_notch_hz_2, gyroConfig()->gyro_soft_notch_cutoff_2);
