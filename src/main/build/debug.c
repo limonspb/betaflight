@@ -111,4 +111,5 @@ const char * const debugModeNames[DEBUG_COUNT] = {
     "DSHOT_TELEMETRY_COUNTS",
     "RPM_LIMIT",
     "TPA",
+    "S_TERM",
 };
