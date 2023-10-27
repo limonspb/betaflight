@@ -224,6 +224,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .tpa_rate = 65,
         .tpa_breakpoint = 1350,
         .tpa_cutoff_hz = 0,
+        .iterm_raw_gyro = 0,
     );
 
 #ifndef USE_D_MIN
@@ -1011,6 +1012,11 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
 
         const float previousIterm = pidData[axis].I;
         float itermErrorRate = errorRate;
+
+        if (pidProfile->iterm_raw_gyro) {
+            itermErrorRate = currentPidSetpoint - gyro.gyroADC[axis];
+        }
+
 #ifdef USE_ABSOLUTE_CONTROL
         const float uncorrectedSetpoint = currentPidSetpoint;
 #endif
