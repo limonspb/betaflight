@@ -1240,6 +1240,7 @@ const clivalue_t valueTable[] = {
     { PARAM_NAME_TPA_RATE,          VAR_UINT8  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, TPA_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_rate) },
     { PARAM_NAME_TPA_BREAKPOINT,    VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { PWM_PULSE_MIN, PWM_PULSE_MAX }, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_breakpoint) },
     { PARAM_NAME_TPA_CUTOFF_HZ,     VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 0, 60000 }, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_cutoff_hz) },
+    { PARAM_NAME_ITERM_RAW_GYRO,     VAR_UINT8 | PROFILE_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_PID_PROFILE, offsetof(pidProfile_t, iterm_raw_gyro) },
 
 // PG_TELEMETRY_CONFIG
 #ifdef USE_TELEMETRY

@@ -79,6 +79,7 @@
 #define PARAM_NAME_PID_AT_MIN_THROTTLE "pid_at_min_throttle"
 #define PARAM_NAME_ANTI_GRAVITY_GAIN "anti_gravity_gain"
 #define PARAM_NAME_TPA_CUTOFF_HZ "tpa_cutoff_hz"
+#define PARAM_NAME_ITERM_RAW_GYRO "iterm_raw_gyro"
 #define PARAM_NAME_ANTI_GRAVITY_CUTOFF_HZ "anti_gravity_cutoff_hz"
 #define PARAM_NAME_ANTI_GRAVITY_P_GAIN "anti_gravity_p_gain"
 #define PARAM_NAME_ACC_LIMIT_YAW "acc_limit_yaw"
