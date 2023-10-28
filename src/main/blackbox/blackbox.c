@@ -1424,6 +1424,15 @@ static bool blackboxWriteSysinfo(void)
         BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_GYRO_HARDWARE_LPF, "%d",      gyroConfig()->gyro_hardware_lpf);
         BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_GYRO_LPF1_TYPE, "%d",         gyroConfig()->gyro_lpf1_type);
         BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_GYRO_LPF1_STATIC_HZ, "%d",    gyroConfig()->gyro_lpf1_static_hz);
+
+        BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_PTERM_ROLL_LPF_STATIC_HZ, "%d",  currentPidProfile->pterm_lpf_static_hz[X]);
+        BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_PTERM_PITCH_LPF_STATIC_HZ, "%d", currentPidProfile->pterm_lpf_static_hz[Y]);
+        BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_PTERM_YAW_LPF_STATIC_HZ, "%d",   currentPidProfile->pterm_lpf_static_hz[Z]);
+
+        BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_PTERM_ROLL_LPF_TYPE, "%d",  currentPidProfile->pterm_lpf_type[X]);
+        BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_PTERM_PITCH_LPF_TYPE, "%d", currentPidProfile->pterm_lpf_type[Y]);
+        BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_PTERM_YAW_LPF_TYPE, "%d",   currentPidProfile->pterm_lpf_type[Z]);
+
 #ifdef USE_DYN_LPF
         BLACKBOX_PRINT_HEADER_LINE("gyro_lpf1_dyn_hz", "%d,%d",             gyroConfig()->gyro_lpf1_dyn_min_hz,
                                                                             gyroConfig()->gyro_lpf1_dyn_max_hz);

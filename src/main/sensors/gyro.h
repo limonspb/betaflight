@@ -161,7 +161,7 @@ typedef enum {
 
 enum {
     FILTER_LPF1 = 0,
-    FILTER_LPF2
+    FILTER_LPF2,
 };
 
 typedef struct gyroConfig_s {
