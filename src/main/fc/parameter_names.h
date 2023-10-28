@@ -201,6 +201,10 @@
 #define PARAM_NAME_GPS_RESCUE_VELOCITY_D "gps_rescue_velocity_d"
 #define PARAM_NAME_GPS_RESCUE_YAW_P "gps_rescue_yaw_p"
 
+#define PARAM_NAME_ITERM_RATE_FREEZE_ROLL "iterm_rate_freeze_roll"
+#define PARAM_NAME_ITERM_RATE_FREEZE_PITCH "iterm_rate_freeze_pitch"
+#define PARAM_NAME_ITERM_RATE_FREEZE_YAW "iterm_rate_freeze_yaw"
+
 #ifdef USE_MAG
 #define PARAM_NAME_GPS_RESCUE_USE_MAG "gps_rescue_use_mag"
 #endif
