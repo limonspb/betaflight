@@ -240,6 +240,8 @@ typedef struct pidProfile_s {
 
     uint16_t pterm_lpf_static_hz[XYZ_AXIS_COUNT];
     uint8_t pterm_lpf_type[XYZ_AXIS_COUNT];
+
+    uint16_t iterm_rate_freeze[XYZ_AXIS_COUNT];
 } pidProfile_t;
 
 PG_DECLARE_ARRAY(pidProfile_t, PID_PROFILE_COUNT, pidProfiles);

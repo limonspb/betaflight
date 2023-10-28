@@ -227,6 +227,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .iterm_raw_gyro = 0,
         .pterm_lpf_static_hz = {0, 0, 0},
         .pterm_lpf_type = {FILTER_PT1, FILTER_PT1, FILTER_PT1},
+        .iterm_rate_freeze = {0 ,0 ,0},
     );
 
 #ifndef USE_D_MIN
@@ -753,6 +754,13 @@ STATIC_UNIT_TESTED void applyItermRelax(const int axis, const float iterm,
             } else if (pidRuntime.itermRelaxType == ITERM_RELAX_GYRO ) {
                 *itermErrorRate = fapplyDeadband(setpointLpf - gyroRate, setpointHpf);
             } else {
+                *itermErrorRate = 0.0f;
+            }
+
+            pidProfile_t *currentPidProfile;
+            currentPidProfile = pidProfilesMutable(systemConfig()->pidProfileIndex);
+
+            if (fabsf(*currentPidSetpoint) > currentPidProfile->iterm_rate_freeze[axis] && currentPidProfile->iterm_rate_freeze[axis]) {
                 *itermErrorRate = 0.0f;
             }
 
