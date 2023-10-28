@@ -89,7 +89,7 @@ FAST_DATA_ZERO_INIT float throttleBoost;
 pt1Filter_t throttleLpf;
 #endif
 
-PG_REGISTER_WITH_RESET_TEMPLATE(pidConfig_t, pidConfig, PG_PID_CONFIG, 3);
+PG_REGISTER_WITH_RESET_TEMPLATE(pidConfig_t, pidConfig, PG_PID_CONFIG, 4);
 
 #if defined(STM32F411xE)
 #define PID_PROCESS_DENOM_DEFAULT       2
