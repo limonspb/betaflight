@@ -66,6 +66,37 @@ static void pidSetTargetLooptime(uint32_t pidLooptime)
 #endif
 }
 
+void initializePtermFilters(const pidProfile_t *pidProfile)
+{
+    for (int axis = FD_ROLL; axis <= FD_YAW; axis++) {
+        if (pidProfile->pterm_lpf_static_hz[axis] > 0) {
+            switch (pidProfile->pterm_lpf_type[axis]) {
+                case FILTER_PT1:
+                    pidRuntime.ptermLowpassApplyFn[axis] = (filterApplyFnPtr)pt1FilterApply;
+                    pt1FilterInit(&pidRuntime.ptermLowpass[axis].pt1Filter, pt1FilterGain(pidProfile->pterm_lpf_static_hz[axis], pidRuntime.dT));
+                    break;
+                case FILTER_BIQUAD:
+                    pidRuntime.ptermLowpassApplyFn[axis] = (filterApplyFnPtr)biquadFilterApply;
+                    biquadFilterInitLPF(&pidRuntime.ptermLowpass[axis].biquadFilter, pidProfile->pterm_lpf_static_hz[axis], pidRuntime.dT);
+                    break;
+                case FILTER_PT2:
+                    pidRuntime.ptermLowpassApplyFn[axis] = (filterApplyFnPtr)pt2FilterApply;
+                    pt2FilterInit(&pidRuntime.ptermLowpass[axis].pt2Filter, pt2FilterGain(pidProfile->pterm_lpf_static_hz[axis], pidRuntime.dT));
+                    break;
+                case FILTER_PT3:
+                    pidRuntime.ptermLowpassApplyFn[axis] = (filterApplyFnPtr)pt3FilterApply;
+                    pt3FilterInit(&pidRuntime.ptermLowpass[axis].pt3Filter, pt3FilterGain(pidProfile->pterm_lpf_static_hz[axis], pidRuntime.dT));
+                    break;
+                default:
+                    pidRuntime.ptermLowpassApplyFn[axis] = nullFilterApply;
+                    break;
+            } // switch
+        }
+
+        pidRuntime.ptermLowpassApplyFn[axis] = nullFilterApply;
+    }
+}
+
 void pidInitFilters(const pidProfile_t *pidProfile)
 {
     STATIC_ASSERT(FD_YAW == 2, FD_YAW_incorrect); // ensure yaw axis is 2
@@ -76,6 +107,9 @@ void pidInitFilters(const pidProfile_t *pidProfile)
         pidRuntime.dtermLowpassApplyFn = nullFilterApply;
         pidRuntime.dtermLowpass2ApplyFn = nullFilterApply;
         pidRuntime.ptermYawLowpassApplyFn = nullFilterApply;
+        for (int axis = FD_ROLL; axis <= FD_YAW; axis++) {
+            pidRuntime.ptermLowpassApplyFn[axis] = nullFilterApply;
+        }
         return;
     }
 
@@ -191,6 +225,8 @@ void pidInitFilters(const pidProfile_t *pidProfile)
     } else {
         pidRuntime.dtermLowpass2ApplyFn = nullFilterApply;
     }
+
+    initializePtermFilters(pidProfile);
 
     if (pidProfile->yaw_lowpass_hz == 0) {
         pidRuntime.ptermYawLowpassApplyFn = nullFilterApply;

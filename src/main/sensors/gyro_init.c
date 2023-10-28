@@ -153,7 +153,6 @@ static bool gyroInitLowpassFilterLpf(int slot, int type, uint16_t lpfHz, uint32_
         lowpassFilterApplyFn = &gyro.lowpass2FilterApplyFn;
         lowpassFilter = gyro.lowpass2Filter;
         break;
-
     default:
         return false;
     }

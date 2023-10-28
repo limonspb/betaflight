@@ -249,6 +249,9 @@ typedef struct pidProfile_s {
     uint8_t ez_landing_speed;               // Speed below which motor output is limited
     uint16_t tpa_cutoff_hz;
     uint8_t iterm_raw_gyro;
+
+    uint16_t pterm_lpf_static_hz[XYZ_AXIS_COUNT];
+    uint8_t pterm_lpf_type[XYZ_AXIS_COUNT];
 } pidProfile_t;
 
 PG_DECLARE_ARRAY(pidProfile_t, PID_PROFILE_COUNT, pidProfiles);
@@ -275,12 +278,12 @@ typedef struct pidAxisData_s {
     float Sum;
 } pidAxisData_t;
 
-typedef union dtermLowpass_u {
+typedef union lowpass_u {
     pt1Filter_t pt1Filter;
     biquadFilter_t biquadFilter;
     pt2Filter_t pt2Filter;
     pt3Filter_t pt3Filter;
-} dtermLowpass_t;
+} lowpass_t;
 
 typedef struct pidCoefficient_s {
     float Kp;
@@ -297,11 +300,15 @@ typedef struct pidRuntime_s {
     filterApplyFnPtr dtermNotchApplyFn;
     biquadFilter_t dtermNotch[XYZ_AXIS_COUNT];
     filterApplyFnPtr dtermLowpassApplyFn;
-    dtermLowpass_t dtermLowpass[XYZ_AXIS_COUNT];
+    lowpass_t dtermLowpass[XYZ_AXIS_COUNT];
     filterApplyFnPtr dtermLowpass2ApplyFn;
-    dtermLowpass_t dtermLowpass2[XYZ_AXIS_COUNT];
+    lowpass_t dtermLowpass2[XYZ_AXIS_COUNT];
     filterApplyFnPtr ptermYawLowpassApplyFn;
     pt1Filter_t ptermYawLowpass;
+
+    lowpass_t ptermLowpass[XYZ_AXIS_COUNT];
+    filterApplyFnPtr ptermLowpassApplyFn[XYZ_AXIS_COUNT];
+
     bool antiGravityEnabled;
     pt2Filter_t antiGravityLpf;
     pt2Filter_t tpaLpf;
