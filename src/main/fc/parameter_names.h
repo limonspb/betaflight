@@ -20,6 +20,7 @@
 
 #pragma once
 
+#define PARAM_NAME_ITERM_RATE_FREEZE "iterm_rate_freeze"
 #define PARAM_NAME_GYRO_HARDWARE_LPF "gyro_hardware_lpf"
 #define PARAM_NAME_GYRO_LPF1_TYPE "gyro_lpf1_type"
 #define PARAM_NAME_GYRO_LPF1_STATIC_HZ "gyro_lpf1_static_hz"

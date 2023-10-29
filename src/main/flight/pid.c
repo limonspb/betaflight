@@ -223,6 +223,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .tpa_mode = TPA_MODE_D,
         .tpa_rate = 65,
         .tpa_breakpoint = 1350,
+        .iterm_rate_freeze  =0,
     );
 
 #ifndef USE_D_MIN
@@ -741,6 +742,13 @@ STATIC_UNIT_TESTED void applyItermRelax(const int axis, const float iterm,
             } else if (pidRuntime.itermRelaxType == ITERM_RELAX_GYRO ) {
                 *itermErrorRate = fapplyDeadband(setpointLpf - gyroRate, setpointHpf);
             } else {
+                *itermErrorRate = 0.0f;
+            }
+
+            pidProfile_t *currentPidProfile;
+            currentPidProfile = pidProfilesMutable(systemConfig()->pidProfileIndex);
+
+            if (fabsf(*currentPidSetpoint) > currentPidProfile->iterm_rate_freeze && currentPidProfile->iterm_rate_freeze) {
                 *itermErrorRate = 0.0f;
             }
 
