@@ -92,8 +92,6 @@ void initializePtermFilters(const pidProfile_t *pidProfile)
                     break;
             } // switch
         }
-
-        pidRuntime.ptermLowpassApplyFn[axis] = nullFilterApply;
     }
 }
 

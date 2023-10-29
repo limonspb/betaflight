@@ -1164,8 +1164,9 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
             }
         }
 
-        if (pidProfile->pterm_lpf_static_hz[axis])
+        if (pidProfile->pterm_lpf_static_hz[axis]) {
             pidData[axis].P = pidRuntime.ptermLowpassApplyFn[axis]((filter_t *)&pidRuntime.ptermLowpass[axis], pidData[axis].P);
+        }
 
         // calculating the PID sum
         const float pidSum = pidData[axis].P + pidData[axis].I + pidData[axis].D + pidData[axis].F + getSterm(axis, pidProfile);
