@@ -233,6 +233,7 @@ typedef struct pidProfile_s {
     uint8_t tpa_mode;                       // Controls which PID terms TPA effects
     uint8_t tpa_rate;                       // Percent reduction in P or D at full throttle
     uint16_t tpa_breakpoint;                // Breakpoint where TPA is activated
+    uint16_t test_array[3];
 } pidProfile_t;
 
 PG_DECLARE_ARRAY(pidProfile_t, PID_PROFILE_COUNT, pidProfiles);
