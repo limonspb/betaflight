@@ -1333,6 +1333,10 @@ static bool blackboxWriteSysinfo(void)
         BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_TPA_CUTOFF_HZ, "%d",          currentPidProfile->tpa_cutoff_hz);
         BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_ITERM_RAW_GYRO, "%d",         currentPidProfile->iterm_raw_gyro);
 
+        BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_ITERM_RATE_FREEZE_ROLL,  "%d", currentPidProfile->iterm_rate_freeze[X]);
+        BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_ITERM_RATE_FREEZE_PITCH, "%d", currentPidProfile->iterm_rate_freeze[Y]);
+        BLACKBOX_PRINT_HEADER_LINE(PARAM_NAME_ITERM_RATE_FREEZE_YAW,   "%d", currentPidProfile->iterm_rate_freeze[Z]);
+
         BLACKBOX_PRINT_HEADER_LINE("rc_rates", "%d,%d,%d",                  currentControlRateProfile->rcRates[ROLL],
                                                                             currentControlRateProfile->rcRates[PITCH],
                                                                             currentControlRateProfile->rcRates[YAW]);
