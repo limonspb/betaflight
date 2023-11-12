@@ -353,7 +353,7 @@ void writeServos(void)
 
     case MIXER_CUSTOM_AIRPLANE:
     case MIXER_AIRPLANE:
-        for (int i = SERVO_PLANE_INDEX_MIN; i <= SERVO_PLANE_INDEX_MAX; i++) {
+        for (int i = SERVO_PLANE_INDEX_MIN + 1; i <= SERVO_PLANE_INDEX_MAX - 1; i++) {
             writeServoWithTracking(servoIndex++, i);
         }
         break;
