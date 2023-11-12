@@ -225,6 +225,11 @@ static const motorMixer_t mixerQuadX1234[] = {
     { 1.0f,  1.0f,  1.0f,  1.0f },          // REAR_L
 };
 
+static const motorMixer_t mixerAirplane[] = {
+    { 1.0f,  0.0f,  0.0f,  1.0f },
+    { 1.0f,  0.0f,  0.0f, -1.0f },
+};
+
 // Keep synced with mixerMode_e
 // Some of these entries are bogus when servos (USE_SERVOS) are not configured,
 // but left untouched to keep ordinals synced with mixerMode_e (and configurator).
@@ -244,7 +249,7 @@ const mixer_t mixers[] = {
     { 8, false, mixerOctoX8 },         // MIXER_OCTOX8
     { 8, false, mixerOctoFlatP },      // MIXER_OCTOFLATP
     { 8, false, mixerOctoFlatX },      // MIXER_OCTOFLATX
-    { 1, true,  mixerSingleProp },     // * MIXER_AIRPLANE
+    { 2, true,  mixerAirplane },     // * MIXER_AIRPLANE
     { 1, true,  mixerSingleProp },     // * MIXER_HELI_120_CCPM
     { 0, true,  NULL },                // * MIXER_HELI_90_DEG
     { 4, false, mixerVtail4 },         // MIXER_VTAIL4
