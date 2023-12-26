@@ -227,7 +227,6 @@ static const motorMixer_t mixerQuadX1234[] = {
 
 static const motorMixer_t mixerAirplane[] = {
     { 1.0f,  0.0f,  0.0f,  0.0f },
-    { 1.0f,  0.0f,  0.0f,  0.0f },
 };
 
 // Keep synced with mixerMode_e
