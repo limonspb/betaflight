@@ -109,9 +109,8 @@ static const servoMixer_t servoMixerAirplane[] = {
 
 static const servoMixer_t servoMixerFlyingWing[] = {
     { SERVO_FLAPPERON_1, INPUT_STABILIZED_ROLL,  100, 0, 0, 100, 0 },
-    { SERVO_FLAPPERON_1, INPUT_STABILIZED_PITCH, 100, 0, 0, 100, 0 },
-    { SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL, -100, 0, 0, 100, 0 },
-    { SERVO_FLAPPERON_2, INPUT_STABILIZED_PITCH, 100, 0, 0, 100, 0 },
+    { SERVO_FLAPPERON_2, INPUT_STABILIZED_ROLL,  100, 0, 0, 100, 0 },
+    { SERVO_ELEVATOR,    INPUT_STABILIZED_PITCH, 100, 0, 0, 100, 0 },
     { SERVO_THROTTLE,    INPUT_STABILIZED_THROTTLE, 100, 0, 0, 100, 0 },
 };
 
@@ -339,6 +338,7 @@ void writeServos(void)
     case MIXER_FLYING_WING:
         writeServoWithTracking(servoIndex++, SERVO_FLAPPERON_1);
         writeServoWithTracking(servoIndex++, SERVO_FLAPPERON_2);
+        writeServoWithTracking(servoIndex++, SERVO_ELEVATOR);
         break;
 
     case MIXER_CUSTOM_AIRPLANE:
