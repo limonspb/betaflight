@@ -808,7 +808,7 @@ static FAST_CODE_NOINLINE float applyLaunchControl(int axis, const rollAndPitchT
 
 float getSterm(int axis, const pidProfile_t *pidProfile)
 {
-    const float sTerm = getSetpointRate(axis) / applyCurve(axis, 1.0) * 1000.0 *
+    const float sTerm = getSetpointRate(axis) / getMaxRcRate(axis) * 1000.0 *
         (float)pidProfile->pid[axis].S / 100.0;
 
     DEBUG_SET(DEBUG_S_TERM, axis, lrintf(sTerm));
