@@ -65,6 +65,9 @@ void pgResetFn_servoConfig(servoConfig_t *servoConfig)
     servoConfig->tri_unarmed_servo = 1;
     servoConfig->servo_lowpass_freq = 0;
     servoConfig->channelForwardingStartChannel = AUX1;
+    servoConfig->fake_flaps_aux = 0;
+    servoConfig->fake_flaps_aux_threshold = 1800;
+    servoConfig->fake_flaps_value = 600;
 
 #ifdef SERVO1_PIN
     servoConfig->dev.ioTags[0] = IO_TAG(SERVO1_PIN);
@@ -464,8 +467,16 @@ void servoMixer(void)
             int16_t min = currentServoMixer[i].min * servo_width / 100 - servo_width / 2;
             int16_t max = currentServoMixer[i].max * servo_width / 100 - servo_width / 2;
 
-            if (currentServoMixer[i].speed == 0)
+            if (currentServoMixer[i].speed == 0) {
                 currentOutput[i] = input[from];
+                if (servoConfig()->fake_flaps_aux > 0 && rcData[servoConfig()->fake_flaps_aux + 3] > servoConfig()->fake_flaps_aux_threshold) {
+                    if (SERVO_FLAPPERON_1 == target) {
+                        currentOutput[i] -= servoConfig()->fake_flaps_value;
+                    } else if (SERVO_FLAPPERON_2 == target) {
+                        currentOutput[i] += servoConfig()->fake_flaps_value;
+                    }
+                }
+            }
             else {
                 if (currentOutput[i] < input[from])
                     currentOutput[i] = constrain(currentOutput[i] + currentServoMixer[i].speed, currentOutput[i], input[from]);
