@@ -108,11 +108,7 @@ PG_DECLARE(mixerConfig_t, mixerConfig);
 
 #define CHANNEL_FORWARDING_DISABLED (uint8_t)0xFF
 
-#ifdef USE_RPM_LIMIT
-#define RPM_LIMIT_ACTIVE mixerConfig()->rpm_limit
-#else
-#define RPM_LIMIT_ACTIVE false
-#endif
+#define RPM_LIMIT_ACTIVE true
 
 extern const mixer_t mixers[];
 extern float motor[MAX_SUPPORTED_MOTORS];
