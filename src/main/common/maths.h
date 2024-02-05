@@ -139,6 +139,7 @@ float acos_approx(float x);
 float exp_approx(float val);
 float log_approx(float val);
 float pow_approx(float a, float b);
+int8_t sign(int8_t v);
 #else
 #define sin_approx(x)       sinf(x)
 #define cos_approx(x)       cosf(x)

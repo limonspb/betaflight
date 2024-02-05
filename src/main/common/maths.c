@@ -60,6 +60,13 @@ float sin_approx(float x)
     return x + x * x2 * (sinPolyCoef3 + x2 * (sinPolyCoef5 + x2 * (sinPolyCoef7 + x2 * sinPolyCoef9)));
 }
 
+int8_t sign(int8_t v)
+{
+    if (v > 0) return 1;
+    if (v < 0) return -1;
+    return 0;
+}
+
 float cos_approx(float x)
 {
     return sin_approx(x + (0.5f * M_PIf));

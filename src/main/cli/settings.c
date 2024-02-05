@@ -985,6 +985,8 @@ const clivalue_t valueTable[] = {
     { "servo_lowpass_hz",           VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 0, 400}, PG_SERVO_CONFIG, offsetof(servoConfig_t, servo_lowpass_freq) },
     { "tri_unarmed_servo",          VAR_INT8   | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_SERVO_CONFIG, offsetof(servoConfig_t, tri_unarmed_servo) },
     { "channel_forwarding_start",   VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { AUX1, MAX_SUPPORTED_RC_CHANNEL_COUNT }, PG_SERVO_CONFIG, offsetof(servoConfig_t, channelForwardingStartChannel) },
+    { "custom_servo_rate",          VAR_INT8   | MASTER_VALUE, .config.minmax = { -100, 100 }, PG_SERVO_CONFIG, offsetof(servoConfig_t, custom_servo_rate) },
+    { "fake_flaps_value",           VAR_INT16  | MASTER_VALUE, .config.minmax = { -1000, 1000 }, PG_SERVO_CONFIG, offsetof(servoConfig_t, fake_flaps_value) },
 #endif
 
 // PG_CONTROLRATE_PROFILES
