@@ -1217,21 +1217,64 @@ static void osdElementMahDrawn(osdElementParms_t *element)
 
 static void osdElementWattHoursDrawn(osdElementParms_t *element)
 {
-    const int mAhDrawn = getMAhDrawn();
-    const float wattHoursDrawn = getWhDrawn();
+    // const int mAhDrawn = getMAhDrawn();
+    // const float wattHoursDrawn = getWhDrawn();
 
-    if (mAhDrawn >= osdConfig()->cap_alarm) {
-        element->attr = DISPLAYPORT_SEVERITY_CRITICAL;
+    // if (mAhDrawn >= osdConfig()->cap_alarm) {
+    //     element->attr = DISPLAYPORT_SEVERITY_CRITICAL;
+    // }
+
+    // if (wattHoursDrawn < 1.0f) {        
+    //     tfp_sprintf(element->buff, "%3dMWH", lrintf(wattHoursDrawn * 1000));
+    // } else {
+    //     int wattHourWholeNumber = (int)wattHoursDrawn;
+    //     int wattHourDecimalValue = (int)((wattHoursDrawn - wattHourWholeNumber) * 100);
+
+    //     tfp_sprintf(element->buff, wattHourDecimalValue >= 10 ? "%3d.%2dWH" : "%3d.0%1dWH", wattHourWholeNumber, wattHourDecimalValue);
+    // }
+    static timeUs_t last_time = 0;
+    static int count = 0;
+ 
+    timeUs_t current_time = osdGetTimerValue(OSD_TIMER_SRC_ON);
+    if (current_time-last_time > 5e6){
+        if (count >= 4) {count = 0;}
+        else {count++;}
     }
-
-    if (wattHoursDrawn < 1.0f) {        
-        tfp_sprintf(element->buff, "%3dMWH", lrintf(wattHoursDrawn * 1000));
-    } else {
-        int wattHourWholeNumber = (int)wattHoursDrawn;
-        int wattHourDecimalValue = (int)((wattHoursDrawn - wattHourWholeNumber) * 100);
-
-        tfp_sprintf(element->buff, wattHourDecimalValue >= 10 ? "%3d.%2dWH" : "%3d.0%1dWH", wattHourWholeNumber, wattHourDecimalValue);
+    char line1[3] = "  ";
+    char line2[3] = "  ";
+    switch (count) {
+    case 0:
+        strcpy(line1, "M8");
+        strcpy(line2, "  ");
+        break;
+    case 1:
+        strcpy(line1, " M");
+        strcpy(line2, " 8");
+        break;
+    case 2:
+        strcpy(line1, "  ");
+        strcpy(line2, "8M");
+        break;
+    case 3:
+        strcpy(line1, "8 ");
+        strcpy(line2, "M ");
+        break;
+    default:
+        strcpy(line1, "M8");
+        strcpy(line2, "  ");
+        break;
     }
+    char logo_str_line_1[2];
+    char logo_str_line_2[2];
+    for (int i = 0; i < 2; i++) {
+        const int len = tfp_sprintf(logo_str_line_1, "%s", line1);
+        logo_str_line_1[len] = '\0';
+        osdDisplayWrite(element, element->elemPosX, element->elemPosY, DISPLAYPORT_SEVERITY_NORMAL, logo_str_line_1);
+        const int len2 = tfp_sprintf(logo_str_line_2, "%s", line2);
+        logo_str_line_2[len2] = '\0';
+        osdDisplayWrite(element, element->elemPosX, element->elemPosY + 1, DISPLAYPORT_SEVERITY_NORMAL, logo_str_line_2);
+    }
+    element->drawElement = false;
 }
 
 static void osdElementMainBatteryUsage(osdElementParms_t *element)
