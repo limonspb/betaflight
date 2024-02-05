@@ -103,6 +103,8 @@ static const box_t boxes[CHECKBOX_ITEM_COUNT] = {
     { .boxId = BOXREADY, .boxName = "READY", .permanentId = 53},
     { .boxId = BOXLAPTIMERRESET, .boxName = "LAP TIMER RESET", .permanentId = 54},
     { .boxId = BOXLEDNOBLINK, .boxName = "LED NO BLINK", .permanentId = 101},
+    { .boxId = BOXFLAPPERONS, .boxName = "FLAPPERONS", .permanentId = 102},
+    { .boxId = BOXSERVORATE, .boxName = "CUSTOM SERVO RATE", .permanentId = 103},
 };
 
 // mask of enabled IDs, calculated on startup based on enabled features. boxId_e is used as bit index
@@ -344,6 +346,9 @@ void initActiveBoxIds(void)
 #if defined(USE_GPS_LAP_TIMER)
     BME(BOXLAPTIMERRESET);
 #endif
+
+    BME(BOXFLAPPERONS);
+    BME(BOXSERVORATE);
 
 #undef BME
     // check that all enabled IDs are in boxes array (check may be skipped when using findBoxById() functions)

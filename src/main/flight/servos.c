@@ -65,6 +65,8 @@ void pgResetFn_servoConfig(servoConfig_t *servoConfig)
     servoConfig->tri_unarmed_servo = 1;
     servoConfig->servo_lowpass_freq = 0;
     servoConfig->channelForwardingStartChannel = AUX1;
+    servoConfig->fake_flaps_value = 600;
+    servoConfig->custom_servo_rate = 100;
 
 #ifdef SERVO1_PIN
     servoConfig->dev.ioTags[0] = IO_TAG(SERVO1_PIN);
@@ -466,6 +468,14 @@ void servoMixer(void)
 
             if (currentServoMixer[i].speed == 0)
                 currentOutput[i] = input[from];
+                if (IS_RC_MODE_ACTIVE(BOXFLAPPERONS)) {
+                    if (SERVO_FLAPPERON_1 == target) {
+                        currentOutput[i] -= servoConfig()->fake_flaps_value;
+                    } else if (SERVO_FLAPPERON_2 == target) {
+                        currentOutput[i] += servoConfig()->fake_flaps_value;
+                    }
+                }
+            }
             else {
                 if (currentOutput[i] < input[from])
                     currentOutput[i] = constrain(currentOutput[i] + currentServoMixer[i].speed, currentOutput[i], input[from]);
@@ -480,7 +490,12 @@ void servoMixer(void)
     }
 
     for (int i = 0; i < MAX_SUPPORTED_SERVOS; i++) {
-        servo[i] = ((int32_t)servoParams(i)->rate * servo[i]) / 100L;
+        int32_t rate = (int32_t)servoParams(i)->rate;
+        if (IS_RC_MODE_ACTIVE(BOXSERVORATE)) {
+            rate = sign(rate) * servoConfig()->custom_servo_rate;
+        }
+
+        servo[i] = ((int32_t)rate * servo[i]) / 100L;
         servo[i] += determineServoMiddleOrForwardFromChannel(i);
     }
 }
