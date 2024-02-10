@@ -114,12 +114,12 @@ PG_REGISTER_WITH_RESET_TEMPLATE(pilotConfig_t, pilotConfig, PG_PILOT_CONFIG, 2);
 PG_RESET_TEMPLATE(pilotConfig_t, pilotConfig,
     .craftName = { 0 },
     .pilotName = { 0 },
-    .extra100Throttle = "KAACK",
-    .extraFcHotWarning = "B*TCH IS HOT",
-    .extraTurtleModeWarning = "SORRY BRYAN",
-    .extraLowBatteryWarning = "AINT LEAVING",
-    .extraArmedWarning = "LETS GO",
-    .extraLandNowWarning = ">> LAND NOW <<",
+    .extra100Throttle = "",
+    .extraFcHotWarning = "",
+    .extraTurtleModeWarning = "",
+    .extraLowBatteryWarning = "",
+    .extraArmedWarning = "",
+    .extraLandNowWarning = "",
 );
 
 PG_REGISTER_WITH_RESET_TEMPLATE(systemConfig_t, systemConfig, PG_SYSTEM_CONFIG, 3);

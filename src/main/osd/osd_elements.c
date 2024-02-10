@@ -1236,9 +1236,10 @@ static void osdElementWattHoursDrawn(osdElementParms_t *element)
     static int count = 0;
  
     timeUs_t current_time = osdGetTimerValue(OSD_TIMER_SRC_ON);
-    if (current_time-last_time > 5e6){
+    if (current_time-last_time > mixerConfig()->mayhem_anim_speed * 1e5){
+        count++;
         if (count >= 4) {count = 0;}
-        else {count++;}
+        last_time = current_time;
     }
     char line1[3] = "  ";
     char line2[3] = "  ";
@@ -1253,11 +1254,11 @@ static void osdElementWattHoursDrawn(osdElementParms_t *element)
         break;
     case 2:
         strcpy(line1, "  ");
-        strcpy(line2, "8M");
+        strcpy(line2, "M8");
         break;
     case 3:
-        strcpy(line1, "8 ");
-        strcpy(line2, "M ");
+        strcpy(line1, "M ");
+        strcpy(line2, "8 ");
         break;
     default:
         strcpy(line1, "M8");
@@ -2101,7 +2102,7 @@ static const char * const osdTableThrottleLimitType[] = {
 
 void osdDrawSpec(displayPort_t *osdDisplayPort)
 {
-    if (!ARMING_FLAG(ARMED) && osdConfig()->extra_osd_show_spec)
+    if (!ARMING_FLAG(ARMED) && false)
     {
         const uint8_t midRow = osdDisplayPort->rows / 2;
         const uint8_t midCol = osdDisplayPort->cols / 2;

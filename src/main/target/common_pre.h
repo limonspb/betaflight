@@ -59,10 +59,6 @@
 #define USE_DSHOT_TELEMETRY_STATS
 #endif
 
-#ifndef USE_RPM_LIMIT
-#define USE_RPM_LIMIT
-#endif
-
 #ifdef STM32F4
 #if defined(STM32F40_41xxx)
 #define USE_FAST_DATA
