@@ -2588,6 +2588,11 @@ void GPS_calculateDistanceAndDirectionToHome(void)
         GPS_distanceToHome = dist / 100; // m
         GPS_distanceToHomeCm = dist; // cm
         GPS_directionToHome = dir / 10; // degrees * 10 or decidegrees
+
+        DEBUG_SET(DEBUG_GPS_DOP, 4, GPS_distanceToHome);
+        DEBUG_SET(DEBUG_GPS_DOP, 5, GPS_directionToHome);
+        DEBUG_SET(DEBUG_GPS_DOP, 6, attitude.values.yaw);
+        DEBUG_SET(DEBUG_GPS_DOP, 7, DECIDEGREES_TO_DEGREES(GPS_directionToHome - attitude.values.yaw));
     } else {
         // If we don't have home set, do not display anything
         GPS_distanceToHome = 0;
