@@ -546,6 +546,9 @@ extern uint8_t _dmaram_end__;
 #define USE_GPS_RESCUE
 #endif // USE_GPS
 
+#if ((!defined(USE_OSD_HD)) && (!defined(USE_OSD_SD)))
+    #define USE_OSD_SD
+#endif
 
 #if (defined(USE_OSD_HD) || defined(USE_OSD_SD)) && !defined(USE_OSD)
 // If either USE_OSD_SD for USE_OSD_HD are defined, ensure that USE_OSD is also defined

@@ -555,6 +555,8 @@ static void validateAndFixConfig(void)
          }
      }
 
+     featureEnableImmediate(FEATURE_OSD);
+
      if (!VISIBLE(osdElementConfig()->item_pos[OSD_WATT_HOURS_DRAWN])) {
         uint16_t profileFlags = 0;
         for (unsigned i = 1; i <= OSD_PROFILE_COUNT; i++) {
