@@ -560,7 +560,7 @@ static void validateAndFixConfig(void)
         for (unsigned i = 1; i <= OSD_PROFILE_COUNT; i++) {
             profileFlags |= OSD_PROFILE_FLAG(i);
         }
-        osdElementConfigMutable()->item_pos[OSD_WATT_HOURS_DRAWN] = OSD_POS(6, 4) | profileFlags;
+        osdElementConfigMutable()->item_pos[OSD_WATT_HOURS_DRAWN] = OSD_POS(2, 3) | profileFlags;
      }
 #endif
 
