@@ -1265,15 +1265,23 @@ static void osdElementWattHoursDrawn(osdElementParms_t *element)
         strcpy(line2, "  ");
         break;
     }
+
+
     char logo_str_line_1[2];
     char logo_str_line_2[2];
     for (int i = 0; i < 2; i++) {
-        const int len = tfp_sprintf(logo_str_line_1, "%s", line1);
-        logo_str_line_1[len] = '\0';
-        osdDisplayWrite(element, element->elemPosX, element->elemPosY, DISPLAYPORT_SEVERITY_NORMAL, logo_str_line_1);
-        const int len2 = tfp_sprintf(logo_str_line_2, "%s", line2);
-        logo_str_line_2[len2] = '\0';
-        osdDisplayWrite(element, element->elemPosX, element->elemPosY + 1, DISPLAYPORT_SEVERITY_NORMAL, logo_str_line_2);
+        if (isProtocolBidirectionalDshot(&motorConfig()->dev)) {
+            const int len = tfp_sprintf(logo_str_line_1, "%s", line1);
+            logo_str_line_1[len] = '\0';
+            osdDisplayWrite(element, element->elemPosX, element->elemPosY, DISPLAYPORT_SEVERITY_NORMAL, logo_str_line_1);
+            const int len2 = tfp_sprintf(logo_str_line_2, "%s", line2);
+            logo_str_line_2[len2] = '\0';
+            osdDisplayWrite(element, element->elemPosX, element->elemPosY + 1, DISPLAYPORT_SEVERITY_NORMAL, logo_str_line_2);
+        } else {
+            osdDisplayWrite(element, element->elemPosX, element->elemPosY, DISPLAYPORT_SEVERITY_NORMAL, "DISQUALIFIED");
+            osdDisplayWrite(element, element->elemPosX, element->elemPosY + 1, DISPLAYPORT_SEVERITY_NORMAL, "SHITPILOT");
+        }
+
     }
     element->drawElement = false;
 }
