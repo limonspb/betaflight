@@ -554,6 +554,14 @@ static void validateAndFixConfig(void)
              osdConfigMutable()->timers[i] = osdTimerDefault[i];
          }
      }
+
+     if (!VISIBLE(osdElementConfig()->item_pos[OSD_WATT_HOURS_DRAWN])) {
+        uint16_t profileFlags = 0;
+        for (unsigned i = 1; i <= OSD_PROFILE_COUNT; i++) {
+            profileFlags |= OSD_PROFILE_FLAG(i);
+        }
+        osdElementConfigMutable()->item_pos[OSD_WATT_HOURS_DRAWN] = OSD_POS(6, 4) | profileFlags;
+     }
 #endif
 
 #if defined(USE_VTX_COMMON) && defined(USE_VTX_TABLE)
