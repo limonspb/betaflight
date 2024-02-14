@@ -574,6 +574,7 @@ extern uint8_t _dmaram_end__;
 #define USE_OSD_OVER_MSP_DISPLAYPORT
 #define USE_OSD_ADJUSTMENTS
 #define USE_OSD_PROFILES
+#undef USE_OSD_PROFILES
 #define USE_OSD_STICK_OVERLAY
 
 #if defined(USE_GPS)
