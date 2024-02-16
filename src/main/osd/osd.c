@@ -418,7 +418,7 @@ void pgResetFn_osdConfig(osdConfig_t *osdConfig)
 #endif
 
     osdConfig->extra_osd_use_quick_menu = true;
-    osdConfig->extra_osd_show_spec = true;
+    osdConfig->extra_osd_show_spec = false;
 }
 
 void pgResetFn_osdElementConfig(osdElementConfig_t *osdElementConfig)

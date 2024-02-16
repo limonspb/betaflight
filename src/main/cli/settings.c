@@ -944,7 +944,7 @@ const clivalue_t valueTable[] = {
     { "rpm_limit_i",                VAR_UINT16 |  MASTER_VALUE,  .config.minmaxUnsigned = { 0, 1000 },       PG_MIXER_CONFIG, offsetof(mixerConfig_t, rpm_limit_i) },
     { "rpm_limit_d",                VAR_UINT16 |  MASTER_VALUE,  .config.minmaxUnsigned = { 0, 100 },        PG_MIXER_CONFIG, offsetof(mixerConfig_t, rpm_limit_d) },
     { "rpm_limit_value",            VAR_UINT16 |  MASTER_VALUE,  .config.minmaxUnsigned = { 1, UINT16_MAX }, PG_MIXER_CONFIG, offsetof(mixerConfig_t, rpm_limit_value) },
-    { "mayhem_logo_anim_speed",     VAR_UINT16 |  MASTER_VALUE,  .config.minmaxUnsigned = { 1, 100 },         PG_MIXER_CONFIG, offsetof(mixerConfig_t, mayhem_anim_speed) },
+    { "mayhem_logo_anim_speed",     VAR_UINT16 |  MASTER_VALUE,  .config.minmaxUnsigned = { 1, 50 },         PG_MIXER_CONFIG, offsetof(mixerConfig_t, mayhem_anim_speed) },
 
 #endif
 

@@ -1217,73 +1217,51 @@ static void osdElementMahDrawn(osdElementParms_t *element)
 
 static void osdElementWattHoursDrawn(osdElementParms_t *element)
 {
-    // const int mAhDrawn = getMAhDrawn();
-    // const float wattHoursDrawn = getWhDrawn();
-
-    // if (mAhDrawn >= osdConfig()->cap_alarm) {
-    //     element->attr = DISPLAYPORT_SEVERITY_CRITICAL;
-    // }
-
-    // if (wattHoursDrawn < 1.0f) {        
-    //     tfp_sprintf(element->buff, "%3dMWH", lrintf(wattHoursDrawn * 1000));
-    // } else {
-    //     int wattHourWholeNumber = (int)wattHoursDrawn;
-    //     int wattHourDecimalValue = (int)((wattHoursDrawn - wattHourWholeNumber) * 100);
-
-    //     tfp_sprintf(element->buff, wattHourDecimalValue >= 10 ? "%3d.%2dWH" : "%3d.0%1dWH", wattHourWholeNumber, wattHourDecimalValue);
-    // }
     static timeUs_t last_time = 0;
     static int count = 0;
- 
-    timeUs_t current_time = osdGetTimerValue(OSD_TIMER_SRC_ON);
-    if (current_time-last_time > mixerConfig()->mayhem_anim_speed * 1e5){
-        count++;
-        if (count >= 4) {count = 0;}
-        last_time = current_time;
-    }
-    char line1[3] = "  ";
-    char line2[3] = "  ";
-    switch (count) {
-    case 0:
-        strcpy(line1, "M8");
-        strcpy(line2, "  ");
-        break;
-    case 1:
-        strcpy(line1, " M");
-        strcpy(line2, " 8");
-        break;
-    case 2:
-        strcpy(line1, "  ");
-        strcpy(line2, "M8");
-        break;
-    case 3:
-        strcpy(line1, "M ");
-        strcpy(line2, "8 ");
-        break;
-    default:
-        strcpy(line1, "M8");
-        strcpy(line2, "  ");
-        break;
-    }
-
-
-    char logo_str_line_1[2];
-    char logo_str_line_2[2];
-    for (int i = 0; i < 2; i++) {
-        if (isProtocolBidirectionalDshot(&motorConfig()->dev)) {
+    if (mixerConfig()->rpm_limit == 1 && mixerConfig()->rpm_limit_value == 24000 && isProtocolBidirectionalDshot(&motorConfig()->dev) && motorConfig()->motorPoleCount == 14 && mixerConfig()->rpm_limit_p == 25 && mixerConfig()->rpm_limit_i == 10 && mixerConfig()->rpm_limit_d == 8) {
+        timeUs_t current_time = osdGetTimerValue(OSD_TIMER_SRC_ON);
+        if (current_time-last_time > mixerConfig()->mayhem_anim_speed * 1e5){
+            count++;
+            if (count >= 4) {count = 0;}
+            last_time = current_time;
+        }
+        char line1[3] = "  ";
+        char line2[3] = "  ";
+        switch (count) {
+        case 0:
+            strcpy(line1, "M8");
+            strcpy(line2, "  ");
+            break;
+        case 1:
+            strcpy(line1, " M");
+            strcpy(line2, " 8");
+            break;
+        case 2:
+            strcpy(line1, "  ");
+            strcpy(line2, "M8");
+            break;
+        case 3:
+            strcpy(line1, "M ");
+            strcpy(line2, "8 ");
+            break;
+        default:
+            strcpy(line1, "M8");
+            strcpy(line2, "  ");
+            break;
+        }
+        char logo_str_line_1[2];
+        char logo_str_line_2[2];
+        for (int i = 0; i < 2; i++) {
             const int len = tfp_sprintf(logo_str_line_1, "%s", line1);
             logo_str_line_1[len] = '\0';
             osdDisplayWrite(element, element->elemPosX, element->elemPosY, DISPLAYPORT_SEVERITY_NORMAL, logo_str_line_1);
             const int len2 = tfp_sprintf(logo_str_line_2, "%s", line2);
             logo_str_line_2[len2] = '\0';
             osdDisplayWrite(element, element->elemPosX, element->elemPosY + 1, DISPLAYPORT_SEVERITY_NORMAL, logo_str_line_2);
-        } else {
-            osdDisplayWrite(element, element->elemPosX, element->elemPosY, DISPLAYPORT_SEVERITY_NORMAL, "DISQUALIFIED");
-            osdDisplayWrite(element, element->elemPosX, element->elemPosY + 1, DISPLAYPORT_SEVERITY_NORMAL, "SHITPILOT");
         }
-
+        element->drawElement = false;
     }
-    element->drawElement = false;
 }
 
 static void osdElementMainBatteryUsage(osdElementParms_t *element)
@@ -2110,7 +2088,7 @@ static const char * const osdTableThrottleLimitType[] = {
 
 void osdDrawSpec(displayPort_t *osdDisplayPort)
 {
-    if (!ARMING_FLAG(ARMED) && false)
+    if (!ARMING_FLAG(ARMED) && osdConfig()->extra_osd_show_spec)
     {
         const uint8_t midRow = osdDisplayPort->rows / 2;
         const uint8_t midCol = osdDisplayPort->cols / 2;
