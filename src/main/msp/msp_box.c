@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of Cleanflight and Betaflight.
  *
  * Cleanflight and Betaflight are free software. You can redistribute
@@ -361,6 +361,7 @@ void initActiveBoxIds(void)
 
     BME(BOXSTICKCOMMANDDISABLE);
     BME(BOXREADY);
+    BME(BOXLEDNOBLINK);
 
 #if defined(USE_GPS_LAP_TIMER)
     BME(BOXLAPTIMERRESET);
