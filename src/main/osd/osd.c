@@ -481,7 +481,7 @@ static void osdCompleteInitialization(void)
     osdDrawLogo(midCol - (OSD_LOGO_COLS) / 2, midRow - 5);
 
     char string_buffer[30];
-    tfp_sprintf(string_buffer, "V%s", FC_VERSION_STRING);
+    tfp_sprintf(string_buffer, "V%s", "MULTIGP");
     displayWrite(osdDisplayPort, midCol -10, midRow, DISPLAYPORT_SEVERITY_NORMAL, string_buffer);
 #ifdef USE_CMS
     displayWrite(osdDisplayPort, midCol - 8, midRow + 2,  DISPLAYPORT_SEVERITY_NORMAL, CMS_STARTUP_HELP_TEXT1);
