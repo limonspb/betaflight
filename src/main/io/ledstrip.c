@@ -133,6 +133,7 @@ void pgResetFn_ledStripConfig(ledStripConfig_t *ledStripConfig)
     ledStripConfig->ledstrip_visual_beeper_color = VISUAL_BEEPER_COLOR;
     ledStripConfig->ledstrip_brightness = 100;
     ledStripConfig->extra_ledstrip_blinkmask = 0x8005; // 0b1000000000000101;
+    ledStripConfig->extra_ledstrip_color = COLOR_BLACK;
 #ifndef UNIT_TEST
     ledStripConfig->ioTag = timerioTagGetByUsage(TIM_USE_LED, 0);
 #endif
@@ -480,6 +481,9 @@ static void applyLedFixedLayers(void)
         switch (fn) {
         case LED_FUNCTION_COLOR:
             color = ledStripStatusModeConfig()->colors[ledGetColor(ledConfig)];
+            if (COLOR_BLACK != ledStripConfig()->extra_ledstrip_color) {
+                color = hsv[ledStripConfig()->extra_ledstrip_color];
+            }
 
             hsvColor_t nextColor = ledStripStatusModeConfig()->colors[(ledGetColor(ledConfig) + 1 + LED_CONFIGURABLE_COLOR_COUNT) % LED_CONFIGURABLE_COLOR_COUNT];
             hsvColor_t previousColor = ledStripStatusModeConfig()->colors[(ledGetColor(ledConfig) - 1 + LED_CONFIGURABLE_COLOR_COUNT) % LED_CONFIGURABLE_COLOR_COUNT];
