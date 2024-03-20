@@ -990,11 +990,11 @@ static bool osdDisplayStat(int statistic, uint8_t displayRow)
 #endif
     case OSD_STAT_EXTRA_KAACK:
         itoa(stats.extra_kaacks, buff, 10);
-        osdDisplayStatisticLabel(midCol, displayRow, "KAACKS", buff);
+        osdDisplayStatisticLabel(midCol, displayRow, "100 COUNT", buff);
         return true;
     case OSD_STAT_EXTRA_KAACK_TOTAL:
         itoa(statsConfig()->stats_extra_total_kaacks, buff, 10);
-        osdDisplayStatisticLabel(midCol, displayRow, "TOTAL KAACKS", buff);
+        osdDisplayStatisticLabel(midCol, displayRow, "100 TOTAL", buff);
         return true;
 
     case OSD_STAT_EXTRA_KAACK_TIME:
@@ -1005,7 +1005,7 @@ static bool osdDisplayStat(int statistic, uint8_t displayRow)
             tfp_sprintf(buff, "%02d:%02d", minutes, seconds);
         }
 
-        osdDisplayStatisticLabel(midCol, displayRow, "KAACK TIME", buff);
+        osdDisplayStatisticLabel(midCol, displayRow, "100 TIME", buff);
         return true;
     case OSD_STAT_EXTRA_KAACK_TIME_TOTAL:
         {
@@ -1015,7 +1015,7 @@ static bool osdDisplayStat(int statistic, uint8_t displayRow)
             tfp_sprintf(buff, "%02d:%02d", minutes, seconds);
         }
 
-        osdDisplayStatisticLabel(midCol, displayRow, "TOTAL KAACK TIME", buff);
+        osdDisplayStatisticLabel(midCol, displayRow, "TOTAL 100 TIME", buff);
         return true;
     case OSD_STAT_EXTRA_AVG_THROTTLE:
         itoa(stats.extra_throttle_sum / stats.extra_throttle_count, buff, 10);
