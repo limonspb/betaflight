@@ -132,7 +132,7 @@ void pgResetFn_ledStripConfig(ledStripConfig_t *ledStripConfig)
     ledStripConfig->ledstrip_beacon_armed_only = false; // blink always
     ledStripConfig->ledstrip_visual_beeper_color = VISUAL_BEEPER_COLOR;
     ledStripConfig->ledstrip_brightness = 100;
-    ledStripConfig->extra_ledstrip_blinkmask = 0x8005; // 0b1000000000000101;
+    ledStripConfig->extra_ledstrip_blinkmask = 0x3333; // 0b1000000000000101;
     ledStripConfig->extra_ledstrip_color = COLOR_BLACK;
     ledStripConfig->extra_ledstrip_color2 = COLOR_BLACK;
     ledStripConfig->extra_ledstrip_color2_brightness = 0;
