@@ -231,7 +231,6 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .ez_landing_limit = 15,
         .ez_landing_speed = 50,
         .tpa_cutoff_hz = 100.0,
-        .tpa_cutoff_hz = 0,
         .iterm_raw_gyro = 0,
         .pterm_lpf_static_hz = {0, 0, 0},
         .pterm_lpf_type = {FILTER_PT1, FILTER_PT1, FILTER_PT1},
