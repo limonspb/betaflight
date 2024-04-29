@@ -205,6 +205,10 @@ void makeStringsUpperCase(void)
     toUpperCase(pilotConfigMutable()->extraTurtleModeWarning, pilotConfig()->extraTurtleModeWarning, MAX_NAME_LENGTH);
     toUpperCase(pilotConfigMutable()->extraLowBatteryWarning, pilotConfig()->extraLowBatteryWarning, MAX_NAME_LENGTH);
     toUpperCase(pilotConfigMutable()->extraArmedWarning, pilotConfig()->extraArmedWarning, MAX_NAME_LENGTH);
+
+    toUpperCase(pilotConfigMutable()->extraPrearm1, pilotConfig()->extraPrearm1, MAX_NAME_LENGTH);
+    toUpperCase(pilotConfigMutable()->extraPrearm2, pilotConfig()->extraPrearm2, MAX_NAME_LENGTH);
+    toUpperCase(pilotConfigMutable()->extraPrearm3, pilotConfig()->extraPrearm3, MAX_NAME_LENGTH);
 }
 
 static void validateAndFixConfig(void)
