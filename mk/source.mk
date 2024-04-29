@@ -214,6 +214,7 @@ COMMON_SRC = \
             blackbox/blackbox_io.c \
             cms/cms.c \
             cms/cms_menu_blackbox.c \
+            cms/cms_menu_extra_led.c \
             cms/cms_menu_failsafe.c \
             cms/cms_menu_firmware.c \
             cms/cms_menu_gps_rescue_multirotor.c \
@@ -495,6 +496,7 @@ SIZE_OPTIMISED_SRC += \
             msp/msp_serial.c \
             cms/cms.c \
             cms/cms_menu_blackbox.c \
+            cms/cms_menu_extra_led.c \
             cms/cms_menu_failsafe.c \
             cms/cms_menu_firmware.c \
             cms/cms_menu_gps_rescue_multirotor.c \
