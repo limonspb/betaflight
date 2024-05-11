@@ -100,6 +100,8 @@
 #include "sensors/battery.h"
 #include "sensors/sensors.h"
 
+#include "common/spec.h"
+
 #ifdef USE_HARDWARE_REVISION_DETECTION
 #include "hardware_revision.h"
 #endif
@@ -506,6 +508,11 @@ static void osdCompleteInitialization(void)
         version_str_buf[i] = toupper(version_str_buf[i]);
     }
     displayWrite(osdDisplayPort, midCol + 12 - version_str_len, midRow, DISPLAYPORT_SEVERITY_NORMAL, version_str_buf);
+
+    SpecType specType = getCurrentSpec();
+    if (specType != SPEC_COUNT) {
+        displayWrite(osdDisplayPort, midCol - 5, midRow + 1,  DISPLAYPORT_SEVERITY_NORMAL, specArray[specType].name);
+    }
 
     #ifdef USE_CMS
     displayWrite(osdDisplayPort, midCol - 8, midRow + 2,  DISPLAYPORT_SEVERITY_NORMAL, CMS_STARTUP_HELP_TEXT1);
