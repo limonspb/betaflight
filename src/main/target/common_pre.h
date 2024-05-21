@@ -172,7 +172,11 @@
 
 #define USE_PINIO
 
-#if !defined(USE_SERIAL_RX)
+#if !defined(USE_SERIALTX) & defined(USE_HEADTRACKER)
+#define USE_SERIALTX
+#endif
+
+#if !defined(USE_SERIALRX)
 
 #define USE_SERIALRX
 #define USE_SERIALRX_CRSF       // Team Black Sheep Crossfire protocol
@@ -184,7 +188,7 @@
 #define USE_SERIALRX_XBUS       // JR
 #define USE_SERIALRX_SRXL2      // Spektrum SRXL2 protocol
 
-#endif // !defined(USE_SERIAL_RX)
+#endif // !defined(USE_SERIALRX)
 
 #if !defined(USE_TELEMETRY)
 #define USE_TELEMETRY
