@@ -83,6 +83,7 @@ void pgResetFn_rxConfig(rxConfig_t *rxConfig)
         .halfDuplex = SERIALRX_HALFDUPLEX,
         .serialrx_provider = SERIALRX_PROVIDER,
         .serialrx_inverted = 0,
+        .serialtx_inverted = 1,
         .spektrum_bind_pin_override_ioTag = IO_TAG(SPEKTRUM_BIND_PIN),
         .spektrum_bind_plug_ioTag = IO_TAG(BINDPLUG_PIN),
         .spektrum_sat_bind = 0,
@@ -114,6 +115,10 @@ void pgResetFn_rxConfig(rxConfig_t *rxConfig)
         .sbus_baud_fast = false,
         .msp_override_channels_mask = 0,
         .crsf_use_negotiated_baud = false,
+        .headtracker_max_angle = 0,
+        .headtracker_yaw_shimmy_enable = true,
+        .headtracker_yaw_shimmy_amplitude = 100,
+        .headtracker_yaw_shimmy_count = 5
     );
 
 #ifdef RX_CHANNELS_TAER

@@ -5135,6 +5135,9 @@ const cliResourceValue_t resourceTable[] = {
     DEFA( OWNER_PULLUP,        PG_PULLUP_CONFIG,   pinPullUpDownConfig_t, ioTag, PIN_PULL_UP_DOWN_COUNT ),
     DEFA( OWNER_PULLDOWN,      PG_PULLDOWN_CONFIG, pinPullUpDownConfig_t, ioTag, PIN_PULL_UP_DOWN_COUNT ),
 #endif
+#ifdef USE_HEADTRACKER
+    DEFS( OWNER_HEADTRACKER,   PG_RX_CONFIG, rxConfig_t, headtracker_ioTag),
+#endif
 };
 
 #undef DEFS
