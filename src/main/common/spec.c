@@ -49,7 +49,13 @@ SpecType getCurrentSpec(void)
 
 bool checkSpec(SpecType specType)
 {
+    bool extraCheck = true;
+    if (specType == SPEC_UWL) {
+        extraCheck = motorConfig()->dev.motorPwmProtocol == PWM_TYPE_DSHOT300;
+    }
+
     return
+        extraCheck &&
         isMotorProtocolBidirDshot() &&
         mixerConfig()->rpm_limit == specArray[specType].rpm_limit &&
         mixerConfig()->rpm_limit_value == specArray[specType].rpm_limit_value &&
@@ -61,6 +67,10 @@ bool checkSpec(SpecType specType)
 
 void setSpec(SpecType specType)
 {
+    if (specType == SPEC_UWL) {
+        motorConfigMutable()->dev.motorPwmProtocol = PWM_TYPE_DSHOT300;
+    }
+
     mixerConfigMutable()->rpm_limit = specArray[specType].rpm_limit;
     mixerConfigMutable()->rpm_limit_value = specArray[specType].rpm_limit_value;
     motorConfigMutable()->motorPoleCount = specArray[specType].motorPoleCount;
@@ -217,5 +227,35 @@ specSettings_t specArray[] = {
               "   " },
         }
     },
+
+    {
+        "UWL 31.5K", // Name
+        true,    // bool rpm_limit;
+        25,      // uint16_t rpm_limit_p;
+        10,      // uint16_t rpm_limit_i;
+        8,       // uint16_t rpm_limit_d;
+        31500,   // uint16_t rpm_limit_value;
+        12,      // uint8_t motorPoleCount;
+        19000,    // uint16_t kv;
+
+        {   // Logo groups
+            { "UW ",
+              "   ",
+              "   " },
+
+            { " U ",
+              " W ",
+              "   " },
+
+            { "   ",
+              "UW ",
+              "   " },
+
+            { "U  ",
+              "W  ",
+              "   " },
+        }
+    },
+
 
 };
