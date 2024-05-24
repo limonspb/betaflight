@@ -26,7 +26,6 @@
 #include "platform.h"
 
 #include "common/axis.h"
-#include "build/debug.h"
 
 #include "drivers/io.h"
 
@@ -83,9 +82,6 @@ void taskHeadtracker(uint32_t currentTime)
         shimmyStartTime = currentTime;
         shimmyCount++;
     }
-
-    debug[0] = (int16_t)yawGyro;
-    debug[1] = (int16_t)shimmyCount;
 
     if ((headtrackerIO && !IORead(headtrackerIO)) || (shimmyCount == SHIMMY_COUNT)) {
         shimmyCount = 0;
