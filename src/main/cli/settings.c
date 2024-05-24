@@ -772,6 +772,9 @@ const clivalue_t valueTable[] = {
 #ifdef USE_SERIALTX
     { "serialtx_inverted",           VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_RX_CONFIG, offsetof(rxConfig_t, serialtx_inverted) },
 #endif
+#ifdef USE_HEADTRACKER
+    { "headtracker_max_angle",       VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 180}, PG_RX_CONFIG, offsetof(rxConfig_t, headtracker_max_angle) },
+#endif
 #ifdef USE_SPEKTRUM_BIND
     { "spektrum_sat_bind",           VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { SPEKTRUM_SAT_BIND_DISABLED, SPEKTRUM_SAT_BIND_MAX}, PG_RX_CONFIG, offsetof(rxConfig_t, spektrum_sat_bind) },
     { "spektrum_sat_bind_autoreset", VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_RX_CONFIG, offsetof(rxConfig_t, spektrum_sat_bind_autoreset) },

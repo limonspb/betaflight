@@ -92,6 +92,15 @@ void taskHeadtracker(uint32_t currentTime)
     angles[PITCH] = attitude.values.pitch + 1800;
     angles[YAW] = (attitude.values.yaw + yawOffset) % 3600;
 
+    if (0 != rxConfig()->headtracker_max_angle) {
+        const int newValueMin = 1800 - rxConfig()->headtracker_max_angle * 10;
+        const int newValueMax = 1800 + rxConfig()->headtracker_max_angle * 10;
+        for (int channel = 0; channel < 3; channel++) {
+            angles[channel] = scaleRange(angles[channel], newValueMin, newValueMax, 0, 3600);
+            angles[channel] = constrain(angles[channel], 0, 3600);
+        }
+    }
+
     for (int channel = 0; channel < 3; channel++) {
         channels[channel] = angles[channel] * 2048 / 3600;
     }

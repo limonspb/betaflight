@@ -84,6 +84,7 @@ void pgResetFn_rxConfig(rxConfig_t *rxConfig)
         .serialrx_provider = SERIALRX_PROVIDER,
         .serialrx_inverted = 0,
         .serialtx_inverted = 0,
+        .headtracker_max_angle = 0,
         .spektrum_bind_pin_override_ioTag = IO_TAG(SPEKTRUM_BIND_PIN),
         .spektrum_bind_plug_ioTag = IO_TAG(BINDPLUG_PIN),
         .spektrum_sat_bind = 0,

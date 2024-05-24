@@ -66,6 +66,7 @@ typedef struct rxConfig_s {
     uint8_t crsf_use_negotiated_baud;          // Use negotiated baud rate for CRSF V3
     uint8_t serialtx_inverted;                 // invert the serial TX protocol compared to it's default setting
     ioTag_t headtracker_ioTag;                 // Pin used to reset yaw on headtracker
+    uint8_t headtracker_max_angle;             // angle for headtracker to report 100% as output; Leave at 0 to have 0 - 360 range
 } rxConfig_t;
 
 PG_DECLARE(rxConfig_t, rxConfig);
