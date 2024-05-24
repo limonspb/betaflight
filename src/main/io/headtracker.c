@@ -26,6 +26,7 @@
 #include "platform.h"
 
 #include "common/axis.h"
+#include "build/debug.h"
 
 #include "drivers/io.h"
 
@@ -34,11 +35,16 @@
 #include "rx/rx.h"
 #include "rx/sbus.h"
 
+#include "sensors/gyro.h"
+
 #include "flight/imu.h"
 
 #if defined(USE_HEADTRACKER)
-int16_t yawOffset = 1800;
-uint32_t lastYawResetTime = 0;
+static int16_t yawOffset = 1800;
+
+#define SHIMMY_PERIOD 500000 // 500ms
+#define SHIMMY_AMP 100       // Shimmy aplitude in deg/s
+#define SHIMMY_COUNT 5
 
 void headtrackerYawReset(void)
 {
@@ -63,8 +69,26 @@ void taskHeadtracker(uint32_t currentTime)
     int16_t angles[3];
     uint16_t channels[3];
     IO_t headtrackerIO = IOGetByTag(rxConfig()->headtracker_ioTag);
+    float yawGyro = gyroGetFilteredDownsampled(YAW);
+    static int8_t shimmyCount = 0;
+    static uint32_t shimmyStartTime = 0;
 
-    if (headtrackerIO && !IORead(headtrackerIO)) {
+    // Check for a head shimmy to reset the yaw
+    if (cmpTimeUs(currentTime, shimmyStartTime) > SHIMMY_PERIOD) {
+        shimmyCount = 0;
+    }
+
+    bool odd = shimmyCount % 2;
+    if ((odd && (yawGyro > SHIMMY_AMP)) || (!odd && (yawGyro < -SHIMMY_AMP))) {
+        shimmyStartTime = currentTime;
+        shimmyCount++;
+    }
+
+    debug[0] = (int16_t)yawGyro;
+    debug[1] = (int16_t)shimmyCount;
+
+    if ((headtrackerIO && !IORead(headtrackerIO)) || (shimmyCount == SHIMMY_COUNT)) {
+        shimmyCount = 0;
         headtrackerYawReset();
     }
     // Use the SBus output to send attitude information for headtracking
