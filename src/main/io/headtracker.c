@@ -77,10 +77,12 @@ void taskHeadtracker(uint32_t currentTime)
         shimmyCount = 0;
     }
 
-    bool odd = shimmyCount % 2;
-    if ((odd && (yawGyro > SHIMMY_AMP)) || (!odd && (yawGyro < -SHIMMY_AMP))) {
-        shimmyStartTime = currentTime;
-        shimmyCount++;
+    if (rxConfig()->headtracker_yaw_reset_shimmy) {
+        bool odd = shimmyCount % 2;
+        if ((odd && (yawGyro > SHIMMY_AMP)) || (!odd && (yawGyro < -SHIMMY_AMP))) {
+            shimmyStartTime = currentTime;
+            shimmyCount++;
+        }
     }
 
     if ((headtrackerIO && !IORead(headtrackerIO)) || (shimmyCount == SHIMMY_COUNT)) {

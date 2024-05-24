@@ -774,6 +774,7 @@ const clivalue_t valueTable[] = {
 #endif
 #ifdef USE_HEADTRACKER
     { "headtracker_max_angle",       VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 180}, PG_RX_CONFIG, offsetof(rxConfig_t, headtracker_max_angle) },
+    { "headtracker_yaw_reset_shimmy",VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_RX_CONFIG, offsetof(rxConfig_t, headtracker_yaw_reset_shimmy) },
 #endif
 #ifdef USE_SPEKTRUM_BIND
     { "spektrum_sat_bind",           VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { SPEKTRUM_SAT_BIND_DISABLED, SPEKTRUM_SAT_BIND_MAX}, PG_RX_CONFIG, offsetof(rxConfig_t, spektrum_sat_bind) },
