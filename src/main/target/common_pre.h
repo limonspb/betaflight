@@ -172,7 +172,7 @@
 
 #define USE_PINIO
 
-#if !defined(USE_SERIALTX) & defined(USE_HEADTRACKER)
+#if !defined(USE_SERIALTX) && defined(USE_HEADTRACKER)
 #define USE_SERIALTX
 #endif
 
