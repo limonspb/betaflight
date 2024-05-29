@@ -49,6 +49,14 @@
 // -Wpadded can be turned on to check padding of structs
 //#pragma GCC diagnostic warning "-Wpadded"
 
+#if !defined(USE_HEADTRACKER)
+#define USE_HEADTRACKER
+#endif
+
+#if !defined(USE_SERIALTX) && defined(USE_HEADTRACKER)
+#define USE_SERIALTX
+#endif
+
 #if !defined(CLOUD_BUILD) && !defined(SITL)
 #define USE_DSHOT
 #endif
@@ -171,10 +179,6 @@
 #define USE_RX_PWM
 
 #define USE_PINIO
-
-#if !defined(USE_SERIALTX) && defined(USE_HEADTRACKER)
-#define USE_SERIALTX
-#endif
 
 #if !defined(USE_SERIALRX)
 
