@@ -125,8 +125,8 @@ void resetPidProfile(pidProfile_t *pidProfile)
             [PID_ROLL] =  PID_ROLL_DEFAULT,
             [PID_PITCH] = PID_PITCH_DEFAULT,
             [PID_YAW] =   PID_YAW_DEFAULT,
-            [PID_LEVEL] = { 50, 75, 75, 50 },
-            [PID_MAG] =   { 40, 0, 0, 0 },
+            [PID_LEVEL] = { 50, 75, 75, 50, 0 },
+            [PID_MAG] =   { 40, 0, 0, 0, 0 },
         },
         .pidSumLimit = PIDSUM_LIMIT,
         .pidSumLimitYaw = PIDSUM_LIMIT_YAW,
@@ -786,6 +786,22 @@ static FAST_CODE_NOINLINE float applyLaunchControl(int axis, const rollAndPitchT
 }
 #endif
 
+static float getSterm(int axis, const pidProfile_t *pidProfile)
+{
+#ifdef USE_WING
+    const float sTerm = getSetpointRate(axis) / getMaxRcRate(axis) * 1000.0f *
+        (float)pidProfile->pid[axis].S / 100.0f;
+
+    DEBUG_SET(DEBUG_S_TERM, axis, lrintf(sTerm));
+
+    return sTerm;
+#else
+    UNUSED(axis);
+    UNUSED(pidProfile);
+    return 0.0f;
+#endif
+}
+
 // Betaflight pid controller, which will be maintained in the future with additional features specialised for current (mini) multirotor usage.
 // Based on 2DOF reference design (matlab)
 void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTimeUs)
@@ -1088,6 +1104,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
                 pidData[axis].P = 0;
                 pidData[axis].D = 0;
                 pidData[axis].F = 0;
+                pidData[axis].S = 0;
             }
         }
 #endif // USE_YAW_SPIN_RECOVERY
@@ -1123,8 +1140,10 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
             }
         }
 
+        pidData[axis].S = getSterm(axis, pidProfile);
+
         // calculating the PID sum
-        const float pidSum = pidData[axis].P + pidData[axis].I + pidData[axis].D + pidData[axis].F;
+        const float pidSum = pidData[axis].P + pidData[axis].I + pidData[axis].D + pidData[axis].F + pidData[axis].S;
 #ifdef USE_INTEGRATED_YAW_CONTROL
         if (axis == FD_YAW && pidRuntime.useIntegratedYaw) {
             pidData[axis].Sum += pidSum * pidRuntime.dT * 100.0f;
@@ -1144,6 +1163,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
             pidData[axis].I = 0;
             pidData[axis].D = 0;
             pidData[axis].F = 0;
+            pidData[axis].S = 0;
 
             pidData[axis].Sum = 0;
         }
