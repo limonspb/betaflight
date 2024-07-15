@@ -466,7 +466,7 @@ void servoMixer(void)
             int16_t min = currentServoMixer[i].min * servo_width / 100 - servo_width / 2;
             int16_t max = currentServoMixer[i].max * servo_width / 100 - servo_width / 2;
 
-            if (currentServoMixer[i].speed == 0)
+            if (currentServoMixer[i].speed == 0) {
                 currentOutput[i] = input[from];
                 if (IS_RC_MODE_ACTIVE(BOXFLAPPERONS)) {
                     if (SERVO_FLAPPERON_1 == target) {
