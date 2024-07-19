@@ -99,6 +99,16 @@ static imuRuntimeConfig_t imuRuntimeConfig;
 float rMat[3][3];
 static fpVector2_t north_ef;
 
+#ifdef USE_WING
+// Angle in radians between nose axis of the craft and the horizontal plane in ground reference.
+// Poitive angle - nose up, negative angle - nose down.
+static float noseAngle = 0.0f;
+float getNoseAngle(void)
+{
+    return noseAngle;
+}
+#endif
+
 #if defined(USE_ACC)
 STATIC_UNIT_TESTED bool attitudeIsEstablished = false;
 #endif
@@ -165,6 +175,14 @@ STATIC_UNIT_TESTED void imuComputeRotationMatrix(void)
 #endif
 }
 
+static void imuComputeNoseAngle(void)
+{
+#ifdef USE_WING
+    const float sinAngle = rMat[2][0];
+    noseAngle = asin_approx(sinAngle);
+#endif // #ifdef USE_WING
+}
+
 static float calculateThrottleAngleScale(uint16_t throttle_correction_angle)
 {
     return (1800.0f / M_PIf) * (900.0f / throttle_correction_angle);
@@ -196,6 +214,7 @@ void imuInit(void)
 #endif
 
     imuComputeRotationMatrix();
+    imuComputeNoseAngle();
 
 #if defined(SIMULATOR_BUILD) && defined(SIMULATOR_MULTITHREAD)
     if (pthread_mutex_init(&imuUpdateLock, NULL) != 0) {
@@ -298,6 +317,7 @@ STATIC_UNIT_TESTED void imuMahonyAHRSupdate(float dt,
 
     // Pre-compute rotation matrix from quaternion
     imuComputeRotationMatrix();
+    imuComputeNoseAngle();
 
     attitudeIsEstablished = true;
 }
@@ -598,6 +618,7 @@ static void imuComputeQuaternionFromRPY(quaternionProducts *quatProd, int16_t in
     quatProd->wz = q0 * q3;
 
     imuComputeRotationMatrix();
+    imuComputeNoseAngle();
 
     attitudeIsEstablished = true;
 }
@@ -784,6 +805,7 @@ void imuSetAttitudeQuat(float w, float x, float y, float z)
     q.z = z;
 
     imuComputeRotationMatrix();
+    imuComputeNoseAngle();
 
     attitudeIsEstablished = true;
 
