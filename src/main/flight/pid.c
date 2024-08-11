@@ -347,6 +347,16 @@ static float getWingTpaArgument(float throttle)
         }
     }
 
+
+    static float speed = 0;
+    
+
+    const float pitchAngleFactor2 = getSinPitchAngle() * getSinPitchAngle() * pitchFactorAdjustment;
+    float terminalSpeed = (throttle2 + pitchAngleFactor2) / maxTpaArgument;
+    float acceleration = (terminalSpeed * terminalSpeed - speed * speed) * pidRuntime.tpaDragK / 2.0f;
+    speed += acceleration;
+    DEBUG_SET(DEBUG_TPA, 4, lrintf(speed * 1000));
+
     tpaArgument = pt2FilterApply(&pidRuntime.tpaLpf, tpaArgument);
     tpaArgument = MAX(tpaArgument, 0.0f);
     DEBUG_SET(DEBUG_TPA, 2, lrintf(tpaArgument * 1000.0f));

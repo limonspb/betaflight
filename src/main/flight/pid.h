@@ -472,6 +472,7 @@ typedef struct pidRuntime_s {
 
 #ifdef USE_WING
     pt2Filter_t tpaLpf;
+    float tpaDragK;
     float tpaLpfGainUp;
     float tpaLpfGainDown;
     float spa[XYZ_AXIS_COUNT]; // setpoint pid attenuation (0.0 to 1.0). 0 - full attenuation, 1 - no attenuation
