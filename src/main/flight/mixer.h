@@ -126,6 +126,7 @@ float getMotorMixRange(void);
 bool areMotorsRunning(void);
 bool areMotorsSaturated(void);
 
+float getAverageMotorOutput(void);
 void mixerLoadMix(int index, motorMixer_t *customMixers);
 void initEscEndpoints(void);
 void mixerInit(mixerMode_e mixerMode);

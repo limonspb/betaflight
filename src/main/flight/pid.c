@@ -274,6 +274,9 @@ void getTpaFactors(const pidProfile_t *pidProfile, float tpaFactor, tpaFactors_t
     tpaFactors->tpaFactorKff = 1.0f;
     tpaFactors->tpaFactorKs = 1.0f;
 
+    float test = tpaFactor * 100.0f / pidProfile->tpa_curve_pid_thr100;
+    tpaFactors->tpaFactorKs = test;
+
 #ifdef USE_TPA_MODE
     switch (pidProfile->tpa_mode) {
     case TPA_MODE_PD:
@@ -321,15 +324,19 @@ void pidResetIterm(void)
 #ifdef USE_WING
 static float getWingTpaArgument(float throttle)
 {
-    const float pitchFactorAdjustment = scaleRangef(throttle, 0.0f, 1.0f, pidRuntime.tpaGravityThr0, pidRuntime.tpaGravityThr100);
+    UNUSED(throttle);
+    const float throttle2 = (float)getAverageMotorOutput() / 2048.0f;
+    const float pitchFactorAdjustment = scaleRangef(throttle2, 0.0f, 1.0f, pidRuntime.tpaGravityThr0, pidRuntime.tpaGravityThr100);
     const float pitchAngleFactor = getSinPitchAngle() * pitchFactorAdjustment;
     DEBUG_SET(DEBUG_TPA, 1, lrintf(pitchAngleFactor * 1000.0f));
 
-    float tpaArgument = throttle + pitchAngleFactor;
+    float tpaArgument = throttle2 + pitchAngleFactor;
     const float maxTpaArgument = MAX(1.0 + pidRuntime.tpaGravityThr100, pidRuntime.tpaGravityThr0);
     tpaArgument = tpaArgument / maxTpaArgument;
     tpaArgument = pt2FilterApply(&pidRuntime.tpaLpf, tpaArgument);
+    tpaArgument = MAX(tpaArgument, 0.0f);
     DEBUG_SET(DEBUG_TPA, 2, lrintf(tpaArgument * 1000.0f));
+    DEBUG_SET(DEBUG_TPA, 3, lrintf(getAverageMotorOutput()));
 
     return tpaArgument;
 }

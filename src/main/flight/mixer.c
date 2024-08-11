@@ -388,6 +388,13 @@ static void applyRpmLimiter(mixerRuntime_t *mixer)
 }
 #endif // USE_RPM_LIMIT
 
+static float averageMotorOutput = 0.0f;
+
+float getAverageMotorOutput(void)
+{
+    return averageMotorOutput;
+}
+
 static void applyMixToMotors(float motorMix[MAX_SUPPORTED_MOTORS], motorMixer_t *activeMixer)
 {
     // Now add in the desired throttle, but keep in a range that doesn't clip adjusted
@@ -423,6 +430,14 @@ static void applyMixToMotors(float motorMix[MAX_SUPPORTED_MOTORS], motorMixer_t 
             motor[i] = motor_disarmed[i];
         }
     }
+
+    float averageMotor = 0.0f;
+    for (int i = 0; i < mixerRuntime.motorCount; i++) {
+        averageMotor += motor[i];
+    }
+    averageMotor /= mixerRuntime.motorCount;
+    averageMotorOutput = averageMotor;
+
     DEBUG_SET(DEBUG_EZLANDING, 1, throttle * 10000U);
     // DEBUG_EZLANDING 0 is the ezLanding factor 2 is the throttle limit
 }
