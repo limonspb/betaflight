@@ -533,7 +533,7 @@ static const char* const lookupTableSwitchMode[] = {
 };
 #endif
 
-#ifdef USE_WING
+#ifdef USE_ADVANCED_TPA
 const char* const lookupTableTpaCurveType[] = {
     "CLASSIC", "HYPERBOLIC",
 };
@@ -665,7 +665,7 @@ const lookupTableEntry_t lookupTables[] = {
     LOOKUP_TABLE_ENTRY(lookupTableFreqDomain),
     LOOKUP_TABLE_ENTRY(lookupTableSwitchMode),
 #endif
-#ifdef USE_WING
+#ifdef USE_ADVANCED_TPA
     LOOKUP_TABLE_ENTRY(lookupTableTpaCurveType),
 #endif
 };
@@ -1285,13 +1285,15 @@ const clivalue_t valueTable[] = {
     { PARAM_NAME_TPA_DELAY_MS, VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 0, UINT16_MAX }, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_delay_ms) },
     { PARAM_NAME_TPA_GRAVITY_THR0, VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 0, TPA_GRAVITY_MAX }, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_gravity_thr0) },
     { PARAM_NAME_TPA_GRAVITY_THR100, VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 0, TPA_GRAVITY_MAX }, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_gravity_thr100) },
+#endif // #ifdef USE_WING
 
+#ifdef USE_ADVANCED_TPA
     { PARAM_NAME_TPA_CURVE_TYPE, VAR_UINT8 | PROFILE_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_TPA_CURVE_TYPE }, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_curve_type) },
     { PARAM_NAME_TPA_CURVE_STALL_THROTTLE, VAR_UINT8  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, TPA_CURVE_STALL_THROTTLE_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_curve_stall_throttle) },
     { PARAM_NAME_TPA_CURVE_PID_THR0, VAR_UINT16  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, TPA_CURVE_PID_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_curve_pid_thr0) },
     { PARAM_NAME_TPA_CURVE_PID_THR100, VAR_UINT16  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, TPA_CURVE_PID_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_curve_pid_thr100) },
     { PARAM_NAME_TPA_CURVE_EXPO, VAR_INT8  | PROFILE_VALUE, .config.minmaxUnsigned = { TPA_CURVE_EXPO_MIN, TPA_CURVE_EXPO_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_curve_expo) },
-#endif // #ifdef USE_WING
+#endif // #ifdef USE_ADVANCED_TPA
 
     { PARAM_NAME_EZ_LANDING_THRESHOLD,      VAR_UINT8  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, 200 }, PG_PID_PROFILE, offsetof(pidProfile_t, ez_landing_threshold) },
     { PARAM_NAME_EZ_LANDING_LIMIT,          VAR_UINT8  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, 75 }, PG_PID_PROFILE, offsetof(pidProfile_t, ez_landing_limit) },
