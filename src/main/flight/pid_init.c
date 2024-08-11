@@ -262,6 +262,8 @@ void pidInitFilters(const pidProfile_t *pidProfile)
     for (int axis = 0; axis < XYZ_AXIS_COUNT; axis++) {
         pidRuntime.spa[axis] = 1.0f; // 1.0 = no PID attenuation in runtime. 0 - full attenuation (no PIDs)
     }
+    pidRuntime.tpaGravityThr0 = pidProfile->tpa_gravity_thr0 / 100.0f;
+    pidRuntime.tpaGravityThr100 = pidProfile->tpa_gravity_thr100 / 100.0f;
 #endif
 }
 
