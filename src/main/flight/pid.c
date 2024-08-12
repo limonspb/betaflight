@@ -258,6 +258,36 @@ void pgResetFn_pidProfiles(pidProfile_t *pidProfiles)
 #define D_LPF_RAW_SCALE 25
 #define D_LPF_PRE_TPA_SCALE 10
 
+typedef struct tpaFactors_s {
+    float tpaFactorKp;
+    float tpaFactorKi;
+    float tpaFactorKd;
+    float tpaFactorKff;
+    float tpaFactorKs;
+} tpaFactors_t;
+
+void getTpaFactors(const pidProfile_t *pidProfile, float tpaFactor, tpaFactors_t *tpaFactors)
+{
+    tpaFactors->tpaFactorKp = 1.0;
+    tpaFactors->tpaFactorKi = 1.0;
+    tpaFactors->tpaFactorKd = tpaFactor;
+    tpaFactors->tpaFactorKff = 1.0f;
+    tpaFactors->tpaFactorKs = 1.0f;
+
+#ifdef USE_TPA_MODE
+    switch (pidProfile->tpa_mode) {
+    case TPA_MODE_PD:
+        tpaFactors->tpaFactorKp = tpaFactor;
+        break;
+    case TPA_MODE_PID:
+        tpaFactors->tpaFactorKp = tpaFactor;
+        tpaFactors->tpaFactorKi = tpaFactor;
+        break;
+    default:
+        break;
+    }
+#endif // #ifdef USE_TPA_MODE
+}
 
 void pidSetItermAccelerator(float newItermAccelerator)
 {
@@ -905,13 +935,8 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
 
     calculateSpaValues(pidProfile);
 
-#ifdef USE_TPA_MODE
-    const float tpaFactorKp = (pidProfile->tpa_mode == TPA_MODE_PD || pidProfile->tpa_mode == TPA_MODE_PID) ? pidRuntime.tpaFactor : 1.0f;
-    const float tpaFactorKi = (pidProfile->tpa_mode == TPA_MODE_PID) ? pidRuntime.tpaFactor : 1.0f;
-#else
-    const float tpaFactorKp = pidRuntime.tpaFactor;
-    const float tpaFactorKi = 1.0f;
-#endif
+    tpaFactors_t tpaFactors;
+    getTpaFactors(pidProfile, pidRuntime.tpaFactor, &tpaFactors);
 
 #ifdef USE_YAW_SPIN_RECOVERY
     const bool yawSpinActive = gyroYawSpinDetected();
@@ -1084,7 +1109,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
         // --------low-level gyro-based PID based on 2DOF PID controller. ----------
 
         // -----calculate P component
-        pidData[axis].P = pidRuntime.pidCoefficient[axis].Kp * errorRate * tpaFactorKp;
+        pidData[axis].P = pidRuntime.pidCoefficient[axis].Kp * errorRate * tpaFactors.tpaFactorKp;
         if (axis == FD_YAW) {
             pidData[axis].P = pidRuntime.ptermYawLowpassApplyFn((filter_t *) &pidRuntime.ptermYawLowpass, pidData[axis].P);
         }
@@ -1113,6 +1138,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
 #endif // USE_WING
 
         pidData[axis].I = constrainf(previousIterm + iTermChange, -pidRuntime.itermLimit, pidRuntime.itermLimit);
+        pidData[axis].I_afterTpa = pidData[axis].I * tpaFactors.tpaFactorKi;
 
         // -----calculate D component
 
@@ -1176,7 +1202,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
             // Apply the dMinFactor
             preTpaD *= dMinFactor;
 #endif
-            pidData[axis].D = preTpaD * pidRuntime.tpaFactor;
+            pidData[axis].D = preTpaD * tpaFactors.tpaFactorKd;
 
             // Log the value of D pre application of TPA
             if (axis != FD_YAW) {
@@ -1200,11 +1226,12 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
 #endif
         // no feedforward in launch control
         const float feedforwardGain = launchControlActive ? 0.0f : pidRuntime.pidCoefficient[axis].Kf;
-        pidData[axis].F = feedforwardGain * pidSetpointDelta;
+        pidData[axis].F = feedforwardGain * pidSetpointDelta * tpaFactors.tpaFactorKff;
 
 #ifdef USE_YAW_SPIN_RECOVERY
         if (yawSpinActive) {
             pidData[axis].I = 0;  // in yaw spin always disable I
+            pidData[axis].I_afterTpa = 0;
             if (axis <= FD_PITCH)  {
                 // zero PIDs on pitch and roll leaving yaw P to correct spin
                 pidData[axis].P = 0;
@@ -1222,14 +1249,17 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
             // yaw has a tendency to windup. Otherwise limit yaw iterm accumulation.
             const int launchControlYawItermLimit = (pidRuntime.launchControlMode == LAUNCH_CONTROL_MODE_FULL) ? LAUNCH_CONTROL_YAW_ITERM_LIMIT : 0;
             pidData[FD_YAW].I = constrainf(pidData[FD_YAW].I, -launchControlYawItermLimit, launchControlYawItermLimit);
+            pidData[FD_YAW].I_afterTpa = pidData[FD_YAW].I;
 
             // for pitch-only mode we disable everything except pitch P/I
             if (pidRuntime.launchControlMode == LAUNCH_CONTROL_MODE_PITCHONLY) {
                 pidData[FD_ROLL].P = 0;
                 pidData[FD_ROLL].I = 0;
+                pidData[FD_ROLL].I_afterTpa = 0;
                 pidData[FD_YAW].P = 0;
                 // don't let I go negative (pitch backwards) as front motors are limited in the mixer
                 pidData[FD_PITCH].I = MAX(0.0f, pidData[FD_PITCH].I);
+                pidData[FD_PITCH].I_afterTpa = pidData[FD_PITCH].I;
             }
         }
 #endif
@@ -1247,10 +1277,12 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
         }
 
         pidData[axis].S = getSterm(axis, pidProfile);
+        pidData[axis].S = pidData[axis].S * tpaFactors.tpaFactorKs;
+
         applySpa(axis, pidProfile);
 
         // calculating the PID sum
-        const float pidSum = pidData[axis].P + pidData[axis].I * tpaFactorKi + pidData[axis].D + pidData[axis].F + pidData[axis].S;
+        const float pidSum = pidData[axis].P + pidData[axis].I_afterTpa + pidData[axis].D + pidData[axis].F + pidData[axis].S;
 #ifdef USE_INTEGRATED_YAW_CONTROL
         if (axis == FD_YAW && pidRuntime.useIntegratedYaw) {
             pidData[axis].Sum += pidSum * pidRuntime.dT * 100.0f;
@@ -1268,6 +1300,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
         for (int axis = FD_ROLL; axis <= FD_YAW; ++axis) {
             pidData[axis].P = 0;
             pidData[axis].I = 0;
+            pidData[axis].I_afterTpa = 0;
             pidData[axis].D = 0;
             pidData[axis].F = 0;
             pidData[axis].S = 0;
