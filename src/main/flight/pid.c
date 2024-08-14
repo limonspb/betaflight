@@ -234,7 +234,6 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .spa_center = { 0, 0, 0 },
         .spa_width = { 0, 0, 0 },
         .spa_mode = { 0, 0, 0 },
-        .ez_landing_disarm_threshold = 0                            ,
         .tpa_curve_type = TPA_CURVE_CLASSIC,
         .tpa_curve_stall_throttle = 30,
         .tpa_curve_pid_thr0 = 200,
