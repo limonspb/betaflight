@@ -349,13 +349,15 @@ static float getWingTpaArgument(float throttle)
 
 
     static float speed = 0;
-    
 
-    const float pitchAngleFactor2 = getSinPitchAngle() * getSinPitchAngle() * pitchFactorAdjustment;
-    float terminalSpeed = (throttle2 + pitchAngleFactor2) / maxTpaArgument;
-    float acceleration = (terminalSpeed * terminalSpeed - speed * speed) * pidRuntime.tpaDragK / 2.0f;
+    const float throttle2 = (float)getAverageMotorOutput() / 2048.0f;
+    const float maxTerminalSpeed = sqrtf(1.0f + (pidRuntime.tpaGravityThr0 * pidRuntime.tpaGravityThr0 / 100.0f / 100.0f));
+    float currentTerminalSpeed = sqrtf(throttle2 * throttle2 + getSinPitchAngle() * (pidRuntime.tpaGravityThr0 * pidRuntime.tpaGravityThr0 / 100.0f / 100.0f));
+    currentTerminalSpeed /= maxTerminalSpeed;
+
+    float acceleration = (currentTerminalSpeed * currentTerminalSpeed - speed * speed) * pidRuntime.tpaDragK / 2.0f;
     speed += acceleration;
-    DEBUG_SET(DEBUG_TPA, 4, lrintf(speed * 1000));
+    DEBUG_SET(DEBUG_TPA, 4, lrintf(speed * 1000)); // predicted speed from 0 ot 1 (or TPA argument)
 
     tpaArgument = pt2FilterApply(&pidRuntime.tpaLpf, tpaArgument);
     tpaArgument = MAX(tpaArgument, 0.0f);
