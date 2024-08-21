@@ -350,9 +350,8 @@ static float getWingTpaArgument(float throttle)
 
     static float speed = 0;
 
-    const float throttle2 = (float)getAverageMotorOutput() / 2048.0f;
-    const float maxTerminalSpeed = sqrtf(1.0f + (pidRuntime.tpaGravityThr0 * pidRuntime.tpaGravityThr0 / 100.0f / 100.0f));
-    float currentTerminalSpeed = sqrtf(throttle2 * throttle2 + getSinPitchAngle() * (pidRuntime.tpaGravityThr0 * pidRuntime.tpaGravityThr0 / 100.0f / 100.0f));
+    const float maxTerminalSpeed = sqrtf(1.0f + (pidRuntime.tpaGravityThr0 * pidRuntime.tpaGravityThr0));
+    float currentTerminalSpeed = sqrtf(throttle2 * throttle2 + getSinPitchAngle() * (pidRuntime.tpaGravityThr0 * pidRuntime.tpaGravityThr0));
     currentTerminalSpeed /= maxTerminalSpeed;
 
     float acceleration = (currentTerminalSpeed * currentTerminalSpeed - speed * speed) * pidRuntime.tpaDragK / 2.0f;
