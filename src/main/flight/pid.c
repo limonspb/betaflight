@@ -882,8 +882,11 @@ static FAST_CODE_NOINLINE float applyLaunchControl(int axis, const rollAndPitchT
 static float getSterm(int axis, const pidProfile_t *pidProfile)
 {
 #ifdef USE_WING
-    const float sTerm = getSetpointRate(axis) / getMaxRcRate(axis) * 1000.0f *
+    float sTerm = getSetpointRate(axis) / getMaxRcRate(axis) * 1000.0f *
         (float)pidProfile->pid[axis].S / 100.0f;
+
+    float test = pidRuntime.tpaFactor * 100.0f / pidProfile->tpa_curve_pid_thr100;    
+    sTerm *= test;
 
     DEBUG_SET(DEBUG_S_TERM, axis, lrintf(sTerm));
 
