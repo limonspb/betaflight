@@ -87,6 +87,8 @@
 #define TPA_CURVE_PWL_SIZE 17
 #endif // USE_ADVANCED_TPA
 
+#define G_ACCELERATION 9.80665f // gravitational acceleration in m/s^2
+
 typedef enum {
     TPA_MODE_PD,
     TPA_MODE_D
@@ -161,6 +163,11 @@ typedef enum tpaCurveType_e {
     TPA_CURVE_CLASSIC,
     TPA_CURVE_HYPERBOLIC,
 } tpaCurveType_t;
+
+typedef enum tpaSpeedEstType_e {
+    TPA_SPEED_EST_BASIC,
+    TPA_SPEED_EST_ADVANCED,
+} tpaSpeedEstType_t;
 
 #define MAX_PROFILE_NAME_LENGTH 8u
 
@@ -287,6 +294,14 @@ typedef struct pidProfile_s {
     uint16_t tpa_curve_pid_thr0;            // For wings: PIDs multiplier at stall speed
     uint16_t tpa_curve_pid_thr100;          // For wings: PIDs multiplier at full speed
     int8_t tpa_curve_expo;                  // For wings: how fast PIDs do transition as speed grows
+    uint8_t tpa_speed_est_type;
+    uint16_t tpa_speed_est_basic_delay;
+    uint16_t tpa_speed_est_basic_gravity;
+    uint16_t tpa_speed_est_adv_prop_pitch;
+    uint16_t tpa_speed_est_adv_mass;
+    uint16_t tpa_speed_est_adv_drag_k;
+    uint16_t tpa_speed_est_adv_twr;
+    uint16_t tpa_speed_est_max_voltage;
 } pidProfile_t;
 
 PG_DECLARE_ARRAY(pidProfile_t, PID_PROFILE_COUNT, pidProfiles);
@@ -326,6 +341,15 @@ typedef struct pidCoefficient_s {
     float Kd;
     float Kf;
 } pidCoefficient_t;
+
+typedef struct tpaSpeedEstParams_s {
+    float maxSpeed;
+    float massDragRatio;
+    float propMaxSpeed;
+    float twr;
+    float speed;
+    float maxVoltage;
+} tpaSpeedEstParams_t;
 
 typedef struct pidRuntime_s {
     float dT;
@@ -467,10 +491,8 @@ typedef struct pidRuntime_s {
 #endif
 
 #ifdef USE_WING
-    pt2Filter_t tpaLpf;
     float spa[XYZ_AXIS_COUNT]; // setpoint pid attenuation (0.0 to 1.0). 0 - full attenuation, 1 - no attenuation
-    float tpaGravityThr0;
-    float tpaGravityThr100;
+    tpaSpeedEstParams_t tpaSpeedEst;
 #endif // USE_WING
 
 #ifdef USE_ADVANCED_TPA

@@ -40,6 +40,8 @@
 #include "flight/pid.h"
 #include "flight/rpm_filter.h"
 
+#include "pg/motor.h"
+
 #include "rx/rx.h"
 
 #include "sensors/gyro.h"
@@ -65,6 +67,58 @@ static void pidSetTargetLooptime(uint32_t pidLooptime)
     dshotSetPidLoopTime(targetPidLooptime);
 #endif
 }
+
+#ifdef USE_WING
+void tpaSpeedEstBasicInit(const pidProfile_t *pidProfile)
+{
+    const float gravityFactor =  pidProfile->tpa_speed_est_basic_gravity / 100.0f;
+    const float delaySec = pidProfile->tpa_speed_est_basic_delay / 1000.0f;
+
+    pidRuntime.tpaSpeedEst.twr = 1.0f / (gravityFactor * gravityFactor);
+    pidRuntime.tpaSpeedEst.massDragRatio = (2.0f/logf(3.0f)) * (2.0f/logf(3.0f)) * pidRuntime.tpaSpeedEst.twr * G_ACCELERATION * delaySec * delaySec;
+    pidRuntime.tpaSpeedEst.maxSpeed = sqrtf(pidRuntime.tpaSpeedEst.massDragRatio * pidRuntime.tpaSpeedEst.twr * G_ACCELERATION + G_ACCELERATION);
+}
+
+
+void tpaSpeedEstAdvancedInit(const pidProfile_t *pidProfile)
+{
+    pidRuntime.tpaSpeedEst.twr = pidProfile->tpa_speed_est_adv_twr / 100.0f;
+    const float mass = pidProfile->tpa_speed_est_adv_mass / 1000.0f;
+    const float dragK = pidProfile->tpa_speed_est_adv_drag_k / 10000.0f;
+    pidRuntime.tpaSpeedEst.massDragRatio = mass / dragK;
+    pidRuntime.tpaSpeedEst.propMaxSpeed = 0.0004233f * pidProfile->tpa_speed_est_adv_prop_pitch * motorConfig()->kv * pidRuntime.tpaSpeedEst.maxVoltage;
+
+    const float maxFallSpeed = sqrtf(mass * G_ACCELERATION / dragK);
+
+    const float a = dragK;
+    const float b = mass * pidRuntime.tpaSpeedEst.twr * G_ACCELERATION / pidRuntime.tpaSpeedEst.propMaxSpeed;
+    const float c = -mass * (pidRuntime.tpaSpeedEst.twr + 1) * G_ACCELERATION;
+
+    const float maxDiveSpeed = (-b + sqrtf(b*b - 4.0f * a * c)) / (2.0f * a);
+
+    pidRuntime.tpaSpeedEst.maxSpeed = MAX(maxFallSpeed, maxDiveSpeed);
+    UNUSED(pidProfile);
+}
+
+
+void tpaSpeedEstInit(const pidProfile_t *pidProfile)
+{
+    pidRuntime.tpaSpeedEst.speed = 0.0f;
+    pidRuntime.tpaSpeedEst.maxVoltage = pidProfile->tpa_speed_est_max_voltage / 100.0f;
+
+    switch (pidProfile->tpa_speed_est_type) {
+    case TPA_SPEED_EST_BASIC:
+        tpaSpeedEstBasicInit(pidProfile);
+        break;
+    case TPA_SPEED_EST_ADVANCED:
+        tpaSpeedEstAdvancedInit(pidProfile);
+        break;
+    default:
+        break;
+    }
+}
+#endif
+
 
 void pidInitFilters(const pidProfile_t *pidProfile)
 {
@@ -257,9 +311,6 @@ void pidInitFilters(const pidProfile_t *pidProfile)
 
     pt2FilterInit(&pidRuntime.antiGravityLpf, pt2FilterGain(pidProfile->anti_gravity_cutoff_hz, pidRuntime.dT));
 #ifdef USE_WING
-    pt2FilterInit(&pidRuntime.tpaLpf, pt2FilterGainFromDelay(pidProfile->tpa_delay_ms / 1000.0f, pidRuntime.dT));
-    pidRuntime.tpaGravityThr0 = pidProfile->tpa_gravity_thr0 / 100.0f;
-    pidRuntime.tpaGravityThr100 = pidProfile->tpa_gravity_thr100 / 100.0f;
     for (int axis = 0; axis < XYZ_AXIS_COUNT; axis++) {
         pidRuntime.spa[axis] = 1.0f; // 1.0 = no PID attenuation in runtime. 0 - full attenuation (no PIDs)
     }
@@ -486,6 +537,10 @@ void pidInitConfig(const pidProfile_t *pidProfile)
     pidRuntime.tpaLowBreakpoint = MIN(pidRuntime.tpaLowBreakpoint, pidRuntime.tpaBreakpoint);
     pidRuntime.tpaLowMultiplier = pidProfile->tpa_low_rate / (100.0f * pidRuntime.tpaLowBreakpoint);
     pidRuntime.tpaLowAlways = pidProfile->tpa_low_always;
+
+#ifdef USE_WING
+    tpaSpeedEstInit(pidProfile);
+#endif
 }
 
 void pidCopyProfile(uint8_t dstPidProfileIndex, uint8_t srcPidProfileIndex)

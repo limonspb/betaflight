@@ -539,6 +539,12 @@ const char* const lookupTableTpaCurveType[] = {
 };
 #endif
 
+#ifdef USE_WING
+const char* const lookupTableTpaSpeedEstType[] = {
+    "BASIC", "ADVANCED",
+};
+#endif
+
 #define LOOKUP_TABLE_ENTRY(name) { name, ARRAYLEN(name) }
 
 const lookupTableEntry_t lookupTables[] = {
@@ -667,6 +673,9 @@ const lookupTableEntry_t lookupTables[] = {
 #endif
 #ifdef USE_ADVANCED_TPA
     LOOKUP_TABLE_ENTRY(lookupTableTpaCurveType),
+#endif
+#ifdef USE_WING
+    LOOKUP_TABLE_ENTRY(lookupTableTpaSpeedEstType),
 #endif
 };
 
@@ -1283,6 +1292,16 @@ const clivalue_t valueTable[] = {
     { PARAM_NAME_TPA_DELAY_MS, VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 0, UINT16_MAX }, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_delay_ms) },
     { PARAM_NAME_TPA_GRAVITY_THR0, VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 0, TPA_GRAVITY_MAX }, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_gravity_thr0) },
     { PARAM_NAME_TPA_GRAVITY_THR100, VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 0, TPA_GRAVITY_MAX }, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_gravity_thr100) },
+
+
+    { PARAM_NAME_TPA_SPEED_EST_TYPE, VAR_UINT8 | PROFILE_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_TPA_SPEED_EST_TYPE }, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_speed_est_type) },
+    { PARAM_NAME_TPA_SPEED_BASIC_DELAY, VAR_UINT16  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, UINT16_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_speed_est_basic_delay) },
+    { PARAM_NAME_TPA_SPEED_BASIC_GRAVITY, VAR_UINT16  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, UINT16_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_speed_est_basic_gravity) },
+    { PARAM_NAME_TPA_SPEED_EST_ADV_PROP_PITCH, VAR_UINT16  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, UINT16_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_speed_est_adv_prop_pitch) },
+    { PARAM_NAME_TPA_SPEED_EST_ADV_MASS, VAR_UINT16  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, UINT16_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_speed_est_adv_mass) },
+    { PARAM_NAME_TPA_SPEED_EST_ADV_DRAG_K, VAR_UINT16  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, UINT16_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_speed_est_adv_drag_k) },
+    { PARAM_NAME_TPA_SPEED_EST_ADV_TWR, VAR_UINT16  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, UINT16_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_speed_est_adv_twr) },
+    { PARAM_NAME_TPA_SPEED_EST_MAX_VOLTAGE, VAR_UINT16  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, UINT16_MAX}, PG_PID_PROFILE, offsetof(pidProfile_t, tpa_speed_est_max_voltage) },
 #endif // USE_WING
 
 #ifdef USE_ADVANCED_TPA
@@ -1375,7 +1394,7 @@ const clivalue_t valueTable[] = {
     { "ledstrip_brightness",        VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 5, 100 }, PG_LED_STRIP_CONFIG, offsetof(ledStripConfig_t, ledstrip_brightness) },
     { "ledstrip_rainbow_delta",     VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 0, HSV_HUE_MAX }, PG_LED_STRIP_CONFIG, offsetof(ledStripConfig_t, ledstrip_rainbow_delta) },
     { "ledstrip_rainbow_freq",      VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 1, 2000 }, PG_LED_STRIP_CONFIG, offsetof(ledStripConfig_t, ledstrip_rainbow_freq) },
-    { "extra_ledstrip_blinkmask",   VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 1, UINT16_MAX }, PG_LED_STRIP_CONFIG, offsetof(ledStripConfig_t, extra_ledstrip_blinkmask) },    
+    { "extra_ledstrip_blinkmask",   VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 1, UINT16_MAX }, PG_LED_STRIP_CONFIG, offsetof(ledStripConfig_t, extra_ledstrip_blinkmask) },
     { "extra_ledstrip_color",       VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_LEDSTRIP_COLOR }, PG_LED_STRIP_CONFIG, offsetof(ledStripConfig_t, extra_ledstrip_color) },
     { "extra_ledstrip_color2",      VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_LEDSTRIP_COLOR }, PG_LED_STRIP_CONFIG, offsetof(ledStripConfig_t, extra_ledstrip_color2) },
     { "extra_ledstrip_color2_brightness",  VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 255 }, PG_LED_STRIP_CONFIG, offsetof(ledStripConfig_t, extra_ledstrip_color2_brightness) },

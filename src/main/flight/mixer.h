@@ -146,3 +146,4 @@ bool isFixedWing(void);
 
 float getMotorOutputLow(void);
 float getMotorOutputHigh(void);
+float getAverageMotorOutput(void);
