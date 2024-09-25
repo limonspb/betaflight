@@ -92,6 +92,14 @@ typedef enum {
 } tpaMode_e;
 
 typedef enum {
+    TERM_P,
+    TERM_I,
+    TERM_D,
+    TERM_F,
+    TERM_S,
+} term_e;
+
+typedef enum {
     SPA_MODE_OFF,
     SPA_MODE_I_FREEZE,
     SPA_MODE_I,
@@ -160,6 +168,11 @@ typedef enum tpaCurveType_e {
     TPA_CURVE_CLASSIC,
     TPA_CURVE_HYPERBOLIC,
 } tpaCurveType_t;
+
+typedef enum yawType_e {
+    YAW_TYPE_RUDDER,
+    YAW_TYPE_DIFF_THRUST,
+} yawType_t;
 
 #define MAX_PROFILE_NAME_LENGTH 8u
 
@@ -289,6 +302,7 @@ typedef struct pidProfile_s {
     uint16_t tpa_curve_pid_thr0;            // For wings: PIDs multiplier at stall speed
     uint16_t tpa_curve_pid_thr100;          // For wings: PIDs multiplier at full speed
     int8_t tpa_curve_expo;                  // For wings: how fast PIDs do transition as speed grows
+    uint8_t yaw_type;                       // For wings: type of yaw (rudder or differential thrust)
 } pidProfile_t;
 
 PG_DECLARE_ARRAY(pidProfile_t, PID_PROFILE_COUNT, pidProfiles);
@@ -479,6 +493,7 @@ typedef struct pidRuntime_s {
     float spa[XYZ_AXIS_COUNT]; // setpoint pid attenuation (0.0 to 1.0). 0 - full attenuation, 1 - no attenuation
     float tpaGravityThr0;
     float tpaGravityThr100;
+    float tpaFactorYaw;
 #endif // USE_WING
 
 #ifdef USE_ADVANCED_TPA

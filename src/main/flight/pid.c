@@ -245,6 +245,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .tpa_curve_pid_thr0 = 200,
         .tpa_curve_pid_thr100 = 70,
         .tpa_curve_expo = 20,
+        .yaw_type = YAW_TYPE_RUDDER,
     );
 }
 
@@ -349,6 +350,17 @@ void pidUpdateTpaFactor(float throttle, const pidProfile_t *pidProfile)
 
     DEBUG_SET(DEBUG_TPA, 0, lrintf(tpaFactor * 1000));
     pidRuntime.tpaFactor = tpaFactor;
+
+#ifdef USE_WING
+    switch (pidProfile->yaw_type) {
+    case YAW_TYPE_DIFF_THRUST:
+        pidRuntime.tpaFactorYaw = getTpaFactorClassic(tpaArgument);
+        break;
+    case YAW_TYPE_RUDDER:
+    default:
+        pidRuntime.tpaFactorYaw = pidRuntime.tpaFactor;
+    }
+#endif // USE_WING
 }
 
 void pidUpdateAntiGravityThrottleFilter(float throttle)
@@ -936,6 +948,37 @@ NOINLINE static void applySpa(int axis, const pidProfile_t *pidProfile)
 #endif // USE_WING
 }
 
+
+static float getTpaFactor(const pidProfile_t *pidProfile, int axis, term_e term)
+{
+    float tpaFactor = pidRuntime.tpaFactor;
+    
+#ifdef USE_WING
+    if (axis == FD_YAW) {
+        tpaFactor = pidRuntime.tpaFactorYaw;
+    }
+#else
+    UNUSED(axis);
+#endif
+
+    switch (term) {
+    case TERM_P:
+#ifdef USE_TPA_MODE
+            return (pidProfile->tpa_mode == TPA_MODE_PD) ? tpaFactor : 1.0f;
+#else
+            UNUSED(pidProfile);
+            return tpaFactor;
+#endif
+        break;
+    case TERM_D:
+        return tpaFactor;
+        break;
+    default:
+        return 1.0f;
+    }
+}
+
+
 // Betaflight pid controller, which will be maintained in the future with additional features specialised for current (mini) multirotor usage.
 // Based on 2DOF reference design (matlab)
 void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTimeUs)
@@ -944,12 +987,6 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
     static float previousRawGyroRateDterm[XYZ_AXIS_COUNT];
 
     calculateSpaValues(pidProfile);
-
-#ifdef USE_TPA_MODE
-    const float tpaFactorKp = (pidProfile->tpa_mode == TPA_MODE_PD) ? pidRuntime.tpaFactor : 1.0f;
-#else
-    const float tpaFactorKp = pidRuntime.tpaFactor;
-#endif
 
 #ifdef USE_YAW_SPIN_RECOVERY
     const bool yawSpinActive = gyroYawSpinDetected();
@@ -1125,7 +1162,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
         // --------low-level gyro-based PID based on 2DOF PID controller. ----------
 
         // -----calculate P component
-        pidData[axis].P = pidRuntime.pidCoefficient[axis].Kp * errorRate * tpaFactorKp;
+        pidData[axis].P = pidRuntime.pidCoefficient[axis].Kp * errorRate * getTpaFactor(pidProfile, axis, TERM_P);
         if (axis == FD_YAW) {
             pidData[axis].P = pidRuntime.ptermYawLowpassApplyFn((filter_t *) &pidRuntime.ptermYawLowpass, pidData[axis].P);
         }
@@ -1222,7 +1259,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
             preTpaD *= dMaxFactor;
 #endif
 
-            pidData[axis].D = preTpaD * pidRuntime.tpaFactor;
+            pidData[axis].D = preTpaD * getTpaFactor(pidProfile, axis, TERM_D);
 
             // Log the value of D pre application of TPA
             if (axis != FD_YAW) {

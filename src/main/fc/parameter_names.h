@@ -66,6 +66,7 @@
 #define PARAM_NAME_TPA_CURVE_PID_THR0 "tpa_curve_pid_thr0"
 #define PARAM_NAME_TPA_CURVE_PID_THR100 "tpa_curve_pid_thr100"
 #define PARAM_NAME_TPA_CURVE_EXPO "tpa_curve_expo"
+#define PARAM_NAME_YAW_TYPE "yaw_type"
 #define PARAM_NAME_MIXER_TYPE "mixer_type"
 #define PARAM_NAME_EZ_LANDING_THRESHOLD "ez_landing_threshold"
 #define PARAM_NAME_EZ_LANDING_LIMIT "ez_landing_limit"
