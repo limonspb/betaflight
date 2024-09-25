@@ -521,6 +521,7 @@ typedef struct pidRuntime_s {
 #ifdef USE_ADVANCED_TPA
     pwl_t tpaCurvePwl;
     float tpaCurvePwl_yValues[TPA_CURVE_PWL_SIZE];
+    tpaCurveType_t tpaCurveType;
 #endif // USE_ADVANCED_TPA
 } pidRuntime_t;
 

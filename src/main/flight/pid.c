@@ -401,7 +401,7 @@ void pidUpdateTpaFactor(float throttle, const pidProfile_t *pidProfile)
 #endif
 
 #ifdef USE_ADVANCED_TPA
-    switch (pidProfile->tpa_curve_type) {
+    switch (pidRuntime.tpaCurveType) {
     case TPA_CURVE_HYPERBOLIC:
         tpaFactor = pwlInterpolate(&pidRuntime.tpaCurvePwl, tpaArgument);
         break;
