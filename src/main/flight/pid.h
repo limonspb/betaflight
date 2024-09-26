@@ -91,7 +91,8 @@
 
 typedef enum {
     TPA_MODE_PD,
-    TPA_MODE_D
+    TPA_MODE_D,
+    TPA_MODE_PDS,
 } tpaMode_e;
 
 typedef enum {
@@ -522,6 +523,7 @@ typedef struct pidRuntime_s {
     pwl_t tpaCurvePwl;
     float tpaCurvePwl_yValues[TPA_CURVE_PWL_SIZE];
     tpaCurveType_t tpaCurveType;
+    float tpaFactorSterm[XYZ_AXIS_COUNT];
 #endif // USE_ADVANCED_TPA
 } pidRuntime_t;
 
