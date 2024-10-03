@@ -1339,6 +1339,7 @@ const clivalue_t valueTable[] = {
     { PARAM_NAME_SPA_YAW_MODE,       VAR_UINT8 | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_SPA_MODE }, PG_PID_PROFILE, offsetof(pidProfile_t, spa_mode[FD_YAW]) },
 
     { PARAM_NAME_YAW_TYPE,           VAR_UINT8 | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_YAW_TYPE }, PG_PID_PROFILE, offsetof(pidProfile_t, yaw_type) },
+    { PARAM_NAME_ANGLE_PITCH_OFFSET, VAR_INT8 | PROFILE_VALUE, .config.minmaxUnsigned = { INT8_MIN, INT8_MAX }, PG_PID_PROFILE, offsetof(pidProfile_t, angle_pitch_offset) },
 #endif
 
 // PG_TELEMETRY_CONFIG

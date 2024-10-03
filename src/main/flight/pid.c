@@ -253,6 +253,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .tpa_speed_est_max_voltage = 2520,
         .tpa_speed_est_pitch_offset = 0,
         .yaw_type = YAW_TYPE_RUDDER,
+        .angle_pitch_offset = 0,
     );
 
 #ifndef USE_D_MIN
@@ -555,6 +556,10 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
 
     float angleTarget = angleLimit * currentPidSetpoint * maxSetpointRateInv;
     // use acro rates for the angle target in both horizon and angle modes, converted to -1 to +1 range using maxRate
+
+    if (axis == FD_PITCH) {
+        angleTarget -= (float)pidProfile->angle_pitch_offset / 10.0f;
+    }
 
 #ifdef USE_GPS_RESCUE
     angleTarget += gpsRescueAngle[axis] / 100.0f; // Angle is in centidegrees, stepped on roll at 10Hz but not on pitch
