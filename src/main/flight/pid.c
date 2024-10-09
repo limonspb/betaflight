@@ -589,7 +589,7 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
     }
 
     //logging
-    if (axis == FD_ROLL) {
+    if (axis == FD_PITCH) {
         DEBUG_SET(DEBUG_ANGLE_MODE, 0, lrintf(angleTarget * 10.0f)); // target angle
         DEBUG_SET(DEBUG_ANGLE_MODE, 1, lrintf(errorAngle * pidRuntime.angleGain * 10.0f)); // un-smoothed error correction in degrees
         DEBUG_SET(DEBUG_ANGLE_MODE, 2, lrintf(angleFeedforward * 10.0f)); // feedforward amount in degrees
@@ -991,19 +991,18 @@ static FAST_CODE_NOINLINE float applyLaunchControl(int axis, const rollAndPitchT
 
 static float getTpaFactor(const pidProfile_t *pidProfile, int axis, term_e term);
 
-static float getSterm(int axis, const pidProfile_t *pidProfile)
+static float getSterm(int axis, const pidProfile_t *pidProfile, float setpoint)
 {
 #ifdef USE_WING
     float sTerm = 0.0f;
 
-    if (!pidRuntime.axisInAngleMode[axis]) {
-        sTerm = getSetpointRate(axis) / getMaxRcRate(axis) * 1000.0f *
-            (float)pidProfile->pid[axis].S / 100.0f;
 
-        DEBUG_SET(DEBUG_S_TERM, 2 * axis, lrintf(sTerm));
-        sTerm *= getTpaFactor(pidProfile, axis, TERM_S);
-        //DEBUG_SET(DEBUG_S_TERM, 2 * axis + 1, lrintf(sTerm));
-    }
+    sTerm = setpoint / getMaxRcRate(axis) * 1000.0f *
+        (float)pidProfile->pid[axis].S / 100.0f;
+
+    DEBUG_SET(DEBUG_S_TERM, 2 * axis, lrintf(sTerm));
+    sTerm *= getTpaFactor(pidProfile, axis, TERM_S);
+    //DEBUG_SET(DEBUG_S_TERM, 2 * axis + 1, lrintf(sTerm));
     return sTerm;
 #else
     UNUSED(axis);
@@ -1245,7 +1244,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
             }
         }
 #endif
-
+        const float currentPidSetpointRaw = currentPidSetpoint;
         if (!IS_AXIS_IN_ANGLE_MODE(axis)) {
             DEBUG_SET(DEBUG_SETPOINT, 2 * axis, lrintf(currentPidSetpoint));
             currentPidSetpoint = wingAdjustSetpoint(currentPidSetpoint, axis);
@@ -1472,7 +1471,7 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
             }
         }
 
-        pidData[axis].S = getSterm(axis, pidProfile);
+        pidData[axis].S = getSterm(axis, pidProfile, currentPidSetpointRaw);
         applySpa(axis, pidProfile);
 
         // calculating the PID sum

@@ -64,7 +64,17 @@ PG_RESET_TEMPLATE(gpsRescueConfig_t, gpsRescueConfig,
     .yawP = 20,
 
     .useMag = GPS_RESCUE_USE_MAG,
-    .imuYawGain = 10
+    .imuYawGain = 10,
+
+    .ap_wing_alt_p = 15,
+    .ap_wing_alt_i = 15,
+    .ap_wing_alt_d = 20,
+    
+    .ap_wing_cog_p = 15,
+    .ap_wing_cog_i = 15,
+    .ap_wing_cog_d = 20,
+
+    .ap_wing_roll_pitch_mix = 0,
 );
 
 #endif // USE_GPS_RESCUE

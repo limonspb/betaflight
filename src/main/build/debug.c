@@ -123,4 +123,5 @@ const char * const debugModeNames[DEBUG_COUNT] = {
     [DEBUG_TASK] = "TASK",
     [DEBUG_ALTHOLD] = "ALTHOLD",
     [DEBUG_SETPOINT] = "SETPOINT",
+    [DEBUG_WING_RTH] = "WING_RTH",
 };

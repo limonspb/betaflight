@@ -30,12 +30,7 @@ typedef struct gpsRescue_s {
     uint16_t returnAltitudeM; // meters
     uint16_t descentDistanceM; // meters
     uint16_t groundSpeedCmS; // centimeters per second
-    uint8_t  throttleP, throttleI, throttleD;
-    uint8_t  yawP;
-    uint16_t throttleMin;
-    uint16_t throttleMax;
     uint8_t  minSats;
-    uint8_t  velP, velI, velD;
     uint16_t minStartDistM; // meters
     uint8_t  sanityChecks;
     uint8_t  allowArmingWithoutFix;
@@ -44,10 +39,22 @@ typedef struct gpsRescue_s {
     uint16_t ascendRate;
     uint16_t descendRate;
     uint16_t initialClimbM; // meters
-    uint8_t  rollMix;
     uint8_t  disarmThreshold;
-    uint8_t  pitchCutoffHz;
     uint8_t  imuYawGain;
+
+    uint8_t  pitchCutoffHz;
+    uint8_t  throttleP, throttleI, throttleD;
+    uint8_t  yawP;
+    uint16_t throttleMin;
+    uint16_t throttleMax;
+    uint8_t  velP, velI, velD;
+    uint8_t  rollMix;
+
+    uint8_t ap_wing_alt_p, ap_wing_alt_i, ap_wing_alt_d;
+    uint8_t ap_wing_cog_p, ap_wing_cog_i, ap_wing_cog_d;
+
+    uint8_t ap_wing_roll_pitch_mix;
+
 } gpsRescueConfig_t;
 
 PG_DECLARE(gpsRescueConfig_t, gpsRescueConfig);

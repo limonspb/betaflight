@@ -125,6 +125,7 @@ typedef enum {
     DEBUG_TASK,
     DEBUG_ALTHOLD,
     DEBUG_SETPOINT,
+    DEBUG_WING_RTH,
     DEBUG_COUNT
 } debugType_e;
 

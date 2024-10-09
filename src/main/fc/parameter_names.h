@@ -224,6 +224,16 @@
 #define PARAM_NAME_GPS_RESCUE_VELOCITY_D "gps_rescue_velocity_d"
 #define PARAM_NAME_GPS_RESCUE_YAW_P "gps_rescue_yaw_p"
 
+#define PARAM_NAME_GPS_RESCUE_WING_ALT_P "ap_wing_alt_p"
+#define PARAM_NAME_GPS_RESCUE_WING_ALT_I "ap_wing_alt_i"
+#define PARAM_NAME_GPS_RESCUE_WING_ALT_D "ap_wing_alt_d"
+
+#define PARAM_NAME_GPS_RESCUE_WING_COG_P "ap_wing_cog_p"
+#define PARAM_NAME_GPS_RESCUE_WING_COG_I "ap_wing_cog_i"
+#define PARAM_NAME_GPS_RESCUE_WING_COG_D "ap_wing_cog_d"
+#define PARAM_NAME_GPS_RESCUE_WING_ROLL_PITCH_MIX "ap_wing_roll_pitch_mix"
+
+
 #ifdef USE_MAG
 #define PARAM_NAME_GPS_RESCUE_USE_MAG "gps_rescue_use_mag"
 #endif // USE_MAG
