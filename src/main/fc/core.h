@@ -99,3 +99,5 @@ void resetTryingToArm();
 void subTaskTelemetryPollSensors(timeUs_t currentTimeUs);
 
 bool isLaunchControlActive(void);
+
+flightLogDisarmReason_e getLastDisarmReason(void);
