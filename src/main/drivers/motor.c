@@ -51,11 +51,25 @@ static bool motorProtocolDshot = false;
 
 void motorShutdown(void)
 {
+    uint32_t shutdownDelayUs = 1500;
     motorDevice->vTable.shutdown();
     motorDevice->enabled = false;
     motorDevice->motorEnableTimeMs = 0;
     motorDevice->initialized = false;
-    delayMicroseconds(1500);
+
+    switch (motorConfig()->dev.motorPwmProtocol) {
+    case PWM_TYPE_STANDARD:
+    case PWM_TYPE_ONESHOT125:
+    case PWM_TYPE_ONESHOT42:
+    case PWM_TYPE_MULTISHOT:
+        // Delay 500ms will disarm esc which can prevent motor spin while reboot
+        shutdownDelayUs += 500 * 1000;
+        break;
+    default:
+        break;
+    }
+
+    delayMicroseconds(shutdownDelayUs);
 }
 
 void motorWriteAll(float *values)
@@ -63,7 +77,7 @@ void motorWriteAll(float *values)
 #ifdef USE_PWM_OUTPUT
     if (motorDevice->enabled) {
 #ifdef USE_DSHOT_BITBANG
-        if (useDshotTelemetry && isDshotBitbangActive(&motorConfig()->dev)) {
+        if (isDshotBitbangActive(&motorConfig()->dev)) {
             // Initialise the output buffers
             if (motorDevice->vTable.updateInit) {
                 motorDevice->vTable.updateInit();
