@@ -258,6 +258,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .tpa_speed_max_voltage = 2520,
         .tpa_speed_pitch_offset = 0,
         .yaw_type = YAW_TYPE_RUDDER,
+        .yaw_roll_coupling = 0,
         .angle_pitch_offset = 0,
     );
 }
@@ -1447,8 +1448,13 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
         pidData[axis].S = getSterm(axis, pidProfile, currentPidSetpointBeforeWingAdjust);
         applySpa(axis, pidProfile);
 
+        float yawRollCoupling = 0.0f;
+        if (axis == FD_ROLL) {
+            yawRollCoupling = gyro.gyroADCf[FD_YAW] * currentPidProfile->yaw_roll_coupling / 100.0f * getTpaFactor(pidProfile, axis, TERM_P);
+        }
+
         // calculating the PID sum
-        const float pidSum = pidData[axis].P + pidData[axis].I + pidData[axis].D + pidData[axis].F + pidData[axis].S;
+        const float pidSum = pidData[axis].P + pidData[axis].I + pidData[axis].D + pidData[axis].F + pidData[axis].S + yawRollCoupling;
 #ifdef USE_INTEGRATED_YAW_CONTROL
         if (axis == FD_YAW && pidRuntime.useIntegratedYaw) {
             pidData[axis].Sum += pidSum * pidRuntime.dT * 100.0f;

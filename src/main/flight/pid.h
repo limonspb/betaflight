@@ -322,6 +322,7 @@ typedef struct pidProfile_s {
     int16_t tpa_speed_pitch_offset;     // For wings: pitch offset in degrees*10 for craft speed estimation
     uint8_t yaw_type;                   // For wings: type of yaw (rudder or differential thrust)
     int16_t angle_pitch_offset;         // For wings: pitch offset for angle modes; in decidegrees; positive values tilting the wing down
+    int16_t yaw_roll_coupling;
 } pidProfile_t;
 
 PG_DECLARE_ARRAY(pidProfile_t, PID_PROFILE_COUNT, pidProfiles);
