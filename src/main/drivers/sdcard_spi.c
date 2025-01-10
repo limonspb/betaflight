@@ -393,7 +393,7 @@ static sdcardReceiveBlockStatus_e sdcard_receiveDataBlock(uint8_t *buffer, int c
         return SDCARD_RECEIVE_BLOCK_IN_PROGRESS;
     case SDCARD_SINGLE_BLOCK_READ_START_TOKEN:
        return SDCARD_RECEIVE_SUCCESS;
-    default: 
+    default:
        return SDCARD_RECEIVE_ERROR;
     }
 }
@@ -596,7 +596,7 @@ static void sdcardSpi_init(const sdcardConfig_t *config, const spiPinConfig_t *s
 
     // Enable the CS line
     if (chipSelectIO != IO_NONE) {
-        IOConfigGPIO(chipSelectIO, SPI_IO_CS_CFG);
+        IOConfigGPIO(chipSelectIO, IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_UP));
     }
 
     sdcard.operationStartTime = millis();
