@@ -139,8 +139,6 @@
 #include "drivers/time.h"
 #include "drivers/vtx_common.h"
 
-#include "drivers/pinio.h"
-
 #include "fc/controlrate_profile.h"
 #include "fc/core.h"
 #include "fc/gps_lap_timer.h"
@@ -240,12 +238,6 @@ static uint32_t blinkBits[(OSD_ITEM_COUNT + 31) / 32];
 #define IS_BLINK(item) (blinkBits[(item) / 32] & (1 << ((item) % 32)))
 #define BLINK(item) (IS_BLINK(item) && blinkState)
 
-// Current element and render status
-static osdElementParms_t activeElement;
-static bool displayPendingForeground;
-static bool displayPendingBackground;
-static char elementBuff[OSD_ELEMENT_BUFFER_LENGTH];
-
 // Return whether element is a SYS element and needs special handling
 #define IS_SYS_OSD_ELEMENT(item) (item >= OSD_SYS_GOGGLE_VOLTAGE) && (item <= OSD_SYS_FAN_SPEED)
 
@@ -296,16 +288,20 @@ static int getEscRpmFreq(int i)
 static void renderOsdEscRpmOrFreq(getEscRpmOrFreqFnPtr escFnPtr, osdElementParms_t *element)
 {
     static uint8_t motor = 0;
+    int x = element->elemPosX;
+    int y = element->elemPosY;
+    char rpmStr[6];
     const int rpm = MIN((*escFnPtr)(motor),99999);
-
-    tfp_sprintf(element->buff, "%d", rpm);
-    element->elemOffsetY = motor;
+    tfp_sprintf(rpmStr, "%d", rpm);
+    osdDisplayWrite(element, x, y + motor, DISPLAYPORT_SEVERITY_NORMAL, rpmStr);
 
     if (++motor == getMotorCount()) {
         motor = 0;
     } else {
         element->rendered = false;
     }
+
+    element->drawElement = false;
 }
 #endif
 
@@ -734,12 +730,7 @@ static void osdElementArtificialHorizon(osdElementParms_t *element)
 
     const int y = ((-rollAngle * x) / 64) - pitchAngle;
     if (y >= 0 && y <= 81) {
-        element->elemOffsetX = x;
-        element->elemOffsetY = y / AH_SYMBOL_COUNT;
-
-        tfp_sprintf(element->buff, "%c", (SYM_AH_BAR9_0 + (y % AH_SYMBOL_COUNT)));
-    } else {
-        element->drawElement = false;  // element does not need to be rendered
+        osdDisplayWriteChar(element, element->elemPosX + x, element->elemPosY + (y / AH_SYMBOL_COUNT), DISPLAYPORT_SEVERITY_NORMAL, (SYM_AH_BAR9_0 + (y % AH_SYMBOL_COUNT)));
     }
 
     if (x == 4) {
@@ -750,6 +741,8 @@ static void osdElementArtificialHorizon(osdElementParms_t *element)
         element->rendered = false;
         x++;
     }
+
+    element->drawElement = false;  // element already drawn
 }
 
 static void osdElementUpDownReference(osdElementParms_t *element)
@@ -772,11 +765,12 @@ static void osdElementUpDownReference(osdElementParms_t *element)
             psiB = earthUpinBodyFrame[1]; // calculate the yaw w/re to zenith (use small angle approx for sine)
             direction = UP;
         }
-        element->elemOffsetX = lrintf(scaleRangef(psiB, -M_PIf / 4, M_PIf / 4, -14, 14));
-        element->elemOffsetY = lrintf(scaleRangef(thetaB, -M_PIf / 4, M_PIf / 4, -8, 8));
+        int posX = element->elemPosX + lrintf(scaleRangef(psiB, -M_PIf / 4, M_PIf / 4, -14, 14));
+        int posY = element->elemPosY + lrintf(scaleRangef(thetaB, -M_PIf / 4, M_PIf / 4, -8, 8));
 
-        tfp_sprintf(element->buff, "%c", symbol[direction]);
+        osdDisplayWrite(element, posX, posY, DISPLAYPORT_SEVERITY_NORMAL, symbol[direction]);
     }
+    element->drawElement = false;  // element already drawn
 }
 #endif // USE_ACC
 
@@ -831,8 +825,6 @@ static void osdBackgroundCameraFrame(osdElementParms_t *element)
         osdDisplayWriteChar(element, xpos, ypos + i, DISPLAYPORT_SEVERITY_NORMAL, SYM_STICK_OVERLAY_VERTICAL);
         osdDisplayWriteChar(element, xpos + width - 1, ypos + i, DISPLAYPORT_SEVERITY_NORMAL, SYM_STICK_OVERLAY_VERTICAL);
 
-        element->drawElement = false;  // element already drawn
-
         if (++i == height) {
             i = 1;
             renderPhase = BOTTOM;
@@ -846,12 +838,15 @@ static void osdBackgroundCameraFrame(osdElementParms_t *element)
         element->buff[width] = 0;  // string terminator
 
         if (renderPhase == TOP) {
+            osdDisplayWrite(element, xpos, ypos, DISPLAYPORT_SEVERITY_NORMAL, element->buff);
             renderPhase = MIDDLE;
         } else {
-            element->elemOffsetY = height - 1;
+            osdDisplayWrite(element, xpos, ypos + height - 1, DISPLAYPORT_SEVERITY_NORMAL, element->buff);
             renderPhase = TOP;
         }
     }
+
+    element->drawElement = false;  // element already drawn
 }
 
 void toUpperCase(char* dest, const char* src, unsigned int maxSrcLength)
@@ -1498,14 +1493,17 @@ static void osdElementPower(osdElementParms_t *element)
 static void osdElementRcChannels(osdElementParms_t *element)
 {
     static uint8_t channel = 0;
+    const uint8_t xpos = element->elemPosX;
+    const uint8_t ypos = element->elemPosY;
 
     if (osdConfig()->rcChannels[channel] >= 0) {
         // Translate (1000, 2000) to (-1000, 1000)
         int data = scaleRange(rcData[osdConfig()->rcChannels[channel]], PWM_RANGE_MIN, PWM_RANGE_MAX, -1000, 1000);
         // Opt for the simplest formatting for now.
         // Decimal notation can be added when tfp_sprintf supports float among fancy options.
-        tfp_sprintf(element->buff, "%5d", data);
-        element->elemOffsetY = channel;
+        char fmtbuf[6];
+        tfp_sprintf(fmtbuf, "%5d", data);
+        osdDisplayWrite(element, xpos, ypos + channel, DISPLAYPORT_SEVERITY_NORMAL, fmtbuf);
     }
 
     if (++channel == OSD_RCCHANNELS_COUNT) {
@@ -1513,6 +1511,8 @@ static void osdElementRcChannels(osdElementParms_t *element)
     } else {
         element->rendered = false;
     }
+
+    element->drawElement = false;  // element already drawn
 }
 
 static void osdElementRemainingTimeEstimate(osdElementParms_t *element)
@@ -1585,12 +1585,12 @@ static void osdElementRsnr(osdElementParms_t *element)
 static void osdBackgroundStickOverlay(osdElementParms_t *element)
 {
     static enum {VERT, HORZ} renderPhase = VERT;
+    const uint8_t xpos = element->elemPosX;
+    const uint8_t ypos = element->elemPosY;
 
     if (renderPhase == VERT) {
         static uint8_t y = 0;
-        tfp_sprintf(element->buff, "%c", SYM_STICK_OVERLAY_VERTICAL);
-        element->elemOffsetX = ((OSD_STICK_OVERLAY_WIDTH - 1) / 2);
-        element->elemOffsetY = y;
+        osdDisplayWriteChar(element, xpos + ((OSD_STICK_OVERLAY_WIDTH - 1) / 2), ypos + y, DISPLAYPORT_SEVERITY_NORMAL, SYM_STICK_OVERLAY_VERTICAL);
 
         y++;
 
@@ -1612,14 +1612,19 @@ static void osdBackgroundStickOverlay(osdElementParms_t *element)
         element->buff[((OSD_STICK_OVERLAY_WIDTH - 1) / 2)] = SYM_STICK_OVERLAY_CENTER;
         element->buff[OSD_STICK_OVERLAY_WIDTH] = 0;  // string terminator
 
-        element->elemOffsetY = ((OSD_STICK_OVERLAY_HEIGHT - 1) / 2);
+        osdDisplayWrite(element, xpos, ypos + ((OSD_STICK_OVERLAY_HEIGHT - 1) / 2), DISPLAYPORT_SEVERITY_NORMAL, element->buff);
 
         renderPhase = VERT;
     }
+
+    element->drawElement = false;  // element already drawn
 }
 
 static void osdElementStickOverlay(osdElementParms_t *element)
 {
+    const uint8_t xpos = element->elemPosX;
+    const uint8_t ypos = element->elemPosY;
+
     // Now draw the cursor
     rc_alias_e vertical_channel, horizontal_channel;
 
@@ -1635,9 +1640,9 @@ static void osdElementStickOverlay(osdElementParms_t *element)
     const uint8_t cursorY = OSD_STICK_OVERLAY_VERTICAL_POSITIONS - 1 - scaleRange(constrain(rcData[vertical_channel], PWM_RANGE_MIN, PWM_RANGE_MAX - 1), PWM_RANGE_MIN, PWM_RANGE_MAX, 0, OSD_STICK_OVERLAY_VERTICAL_POSITIONS);
     const char cursor = SYM_STICK_OVERLAY_SPRITE_HIGH + (cursorY % OSD_STICK_OVERLAY_SPRITE_HEIGHT);
 
-    tfp_sprintf(element->buff, "%c", cursor);
-    element->elemOffsetX = cursorX;
-    element->elemOffsetY = cursorY / OSD_STICK_OVERLAY_SPRITE_HEIGHT;
+    osdDisplayWriteChar(element, xpos + cursorX, ypos + cursorY / OSD_STICK_OVERLAY_SPRITE_HEIGHT, DISPLAYPORT_SEVERITY_NORMAL, cursor);
+
+    element->drawElement = false;  // element already drawn
 }
 #endif // USE_OSD_STICK_OVERLAY
 
@@ -1746,7 +1751,7 @@ static void osdElementSpecLogo(osdElementParms_t *element)
             lastLogoAnimationUpdateMs = millis();
             animationState = (animationState + 1) % LOGO_GROUPS; // increment animation state and make sure its < LOGO_GROUPS
         }
-        
+
         state = -1;
     } else {
         element->rendered = false;
@@ -2137,30 +2142,30 @@ static bool osdDrawSingleElement(displayPort_t *osdDisplayPort, uint8_t item)
 
     uint8_t elemPosX = OSD_X(osdElementConfig()->item_pos[item]);
     uint8_t elemPosY = OSD_Y(osdElementConfig()->item_pos[item]);
+    char buff[OSD_ELEMENT_BUFFER_LENGTH] = "";
 
-    activeElement.item = item;
-    activeElement.elemPosX = elemPosX;
-    activeElement.elemPosY = elemPosY;
-    activeElement.elemOffsetX = 0;
-    activeElement.elemOffsetY = 0;
-    activeElement.type = OSD_TYPE(osdElementConfig()->item_pos[item]);
-    activeElement.buff = elementBuff;
-    activeElement.osdDisplayPort = osdDisplayPort;
-    activeElement.drawElement = true;
-    activeElement.rendered = true;
-    activeElement.attr = DISPLAYPORT_SEVERITY_NORMAL;
+    osdElementParms_t element;
+    element.item = item;
+    element.elemPosX = elemPosX;
+    element.elemPosY = elemPosY;
+    element.type = OSD_TYPE(osdElementConfig()->item_pos[item]);
+    element.buff = (char *)&buff;
+    element.osdDisplayPort = osdDisplayPort;
+    element.drawElement = true;
+    element.rendered = true;
+    element.attr = DISPLAYPORT_SEVERITY_NORMAL;
 
     // Call the element drawing function
     if (IS_SYS_OSD_ELEMENT(item)) {
         displaySys(osdDisplayPort, elemPosX, elemPosY, (displayPortSystemElement_e)(item - OSD_SYS_GOGGLE_VOLTAGE + DISPLAYPORT_SYS_GOGGLE_VOLTAGE));
     } else {
-        osdElementDrawFunction[item](&activeElement);
-        if (activeElement.drawElement) {
-            displayPendingForeground = true;
+        osdElementDrawFunction[item](&element);
+        if (element.drawElement) {
+            osdDisplayWrite(&element, elemPosX, elemPosY, element.attr, buff);
         }
     }
 
-    return activeElement.rendered;
+    return element.rendered;
 }
 
 static bool osdDrawSingleElementBackground(displayPort_t *osdDisplayPort, uint8_t item)
@@ -2172,7 +2177,10 @@ static bool osdDrawSingleElementBackground(displayPort_t *osdDisplayPort, uint8_
 
     uint8_t elemPosX = OSD_X(osdElementConfig()->item_pos[item]);
     uint8_t elemPosY = OSD_Y(osdElementConfig()->item_pos[item]);
+    char buff[OSD_ELEMENT_BUFFER_LENGTH] = "";
 
+
+/*
     activeElement.item = item;
     activeElement.elemPosX = elemPosX;
     activeElement.elemPosY = elemPosY;
@@ -2184,26 +2192,31 @@ static bool osdDrawSingleElementBackground(displayPort_t *osdDisplayPort, uint8_
     activeElement.drawElement = true;
     activeElement.rendered = true;
     activeElement.attr = DISPLAYPORT_SEVERITY_NORMAL;
+*/
+    osdElementParms_t element;
+    element.item = item;
+    element.elemPosX = elemPosX;
+    element.elemPosY = elemPosY;
+    element.type = OSD_TYPE(osdElementConfig()->item_pos[item]);
+    element.buff = (char *)&buff;
+    element.osdDisplayPort = osdDisplayPort;
+    element.rendered = true;
+    element.drawElement = true;
 
     // Call the element background drawing function
-    osdElementBackgroundFunction[item](&activeElement);
-    if (activeElement.drawElement) {
-        displayPendingBackground = true;
+    osdElementBackgroundFunction[item](&element);
+    if (element.drawElement) {
+        osdDisplayWrite(&element, elemPosX, elemPosY, DISPLAYPORT_SEVERITY_NORMAL, buff);
     }
 
-    return activeElement.rendered;
+    return element.rendered;
 }
 
-static uint8_t activeElementNumber = 0;
-
-bool osdIsRenderPending(void)
-{
-    return displayPendingForeground | displayPendingBackground;
-}
+static uint8_t activeElement = 0;
 
 uint8_t osdGetActiveElement(void)
 {
-    return activeElementNumber;
+    return activeElement;
 }
 
 uint8_t osdGetActiveElementCount(void)
@@ -2211,78 +2224,36 @@ uint8_t osdGetActiveElementCount(void)
     return activeOsdElementCount;
 }
 
-// Return true if there is more to display
-bool osdDisplayActiveElement(void)
-{
-    if (activeElementNumber >= activeOsdElementCount) {
-        return false;
-    }
-
-    // If there's a previously drawn background string to be displayed, do that
-    if (displayPendingBackground) {
-        osdDisplayWrite(&activeElement,
-                        activeElement.elemPosX + activeElement.elemOffsetX,
-                        activeElement.elemPosY + activeElement.elemOffsetY,
-                        activeElement.attr, activeElement.buff);
-
-        activeElement.buff[0] = '\0';
-
-        displayPendingBackground = false;
-
-        return displayPendingForeground;
-    }
-
-    // If there's a previously drawn foreground string to be displayed, do that
-    if (displayPendingForeground) {
-        osdDisplayWrite(&activeElement,
-                        activeElement.elemPosX + activeElement.elemOffsetX,
-                        activeElement.elemPosY + activeElement.elemOffsetY,
-                        activeElement.attr, activeElement.buff);
-
-        activeElement.buff[0] = '\0';
-
-        displayPendingForeground = false;
-    }
-
-    return false;
-}
-
 // Return true if there are more elements to draw
-bool osdDrawNextActiveElement(displayPort_t *osdDisplayPort)
+bool osdDrawNextActiveElement(displayPort_t *osdDisplayPort, timeUs_t currentTimeUs)
 {
+    UNUSED(currentTimeUs);
     static bool backgroundRendered = false;
+    bool retval = true;
 
-    if (activeElementNumber >= activeOsdElementCount) {
-        activeElementNumber = 0;
+    if (activeElement >= activeOsdElementCount) {
         return false;
     }
 
-    uint8_t item = activeOsdElementArray[activeElementNumber];
-
-    if (!backgroundLayerSupported && osdElementBackgroundFunction[item] && !backgroundRendered) {
+    if (!backgroundLayerSupported && !backgroundRendered) {
         // If the background layer isn't supported then we
         // have to draw the element's static layer as well.
-        backgroundRendered = osdDrawSingleElementBackground(osdDisplayPort, item);
+        backgroundRendered = osdDrawSingleElementBackground(osdDisplayPort, activeOsdElementArray[activeElement]);
 
-        // After the background always come back to check for foreground
-        return true;
+        return retval;
     }
 
     // Only advance to the next element if rendering is complete
-    if (osdDrawSingleElement(osdDisplayPort, item)) {
-        // If rendering is complete then advance to the next element
-        if (activeElement.rendered) {
-            // Prepare to render the background of the next element
-            backgroundRendered = false;
-
-            if (++activeElementNumber >= activeOsdElementCount) {
-                activeElementNumber = 0;
-                return false;
-            }
+    if (osdDrawSingleElement(osdDisplayPort, activeOsdElementArray[activeElement])) {
+        // Prepare to render the background of the next element
+        backgroundRendered = false;
+        if (++activeElement >= activeOsdElementCount) {
+            activeElement = 0;
+            retval = false;
         }
     }
 
-    return true;
+    return retval;
 }
 
 #ifdef USE_SPEC_PREARM_SCREEN
@@ -2408,7 +2379,7 @@ bool osdDrawPrearmStrings(displayPort_t *osdDisplayPort)
             displayWrite(osdDisplayPort, midCol - (len / 2), currentRow++, DISPLAYPORT_SEVERITY_NORMAL, buff);
             break;
         case 1:
-            state++;            
+            state++;
             len = tfp_sprintf(buff, "%s", pilotConfig()->extraPrearm2);
             displayWrite(osdDisplayPort, midCol - (len / 2), currentRow++, DISPLAYPORT_SEVERITY_NORMAL, buff);
             break;
@@ -2454,11 +2425,16 @@ void osdElementsInit(bool backgroundLayerFlag)
     pt1FilterInit(&batteryEfficiencyFilt, pt1FilterGain(EFFICIENCY_CUTOFF_HZ, 1.0f / osdConfig()->framerate_hz));
 }
 
-void osdSyncBlink(timeUs_t currentTimeUs)
+void osdSyncBlink(void)
 {
-    const int period = 1000000/OSD_BLINK_FREQUENCY_HZ;
+    static int blinkCount = 0;
 
-    blinkState = ((currentTimeUs % period) < (period >> 1));
+    // If the OSD blink is due a transition, do so
+    // Task runs at osdConfig()->framerate_hz Hz, so this will cycle at 2Hz
+    if (++blinkCount == ((osdConfig()->framerate_hz / OSD_BLINK_FREQUENCY_HZ) / 2)) {
+        blinkCount = 0;
+        blinkState = !blinkState;
+    }
 }
 
 void osdResetAlarms(void)

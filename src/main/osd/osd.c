@@ -60,8 +60,6 @@
 #include "drivers/sdcard.h"
 #include "drivers/time.h"
 
-#include "drivers/pinio.h"
-
 #include "fc/core.h"
 #include "fc/gps_lap_timer.h"
 #include "fc/rc_controls.h"
@@ -207,10 +205,10 @@ const osd_stats_e osdStatsDisplayOrder[OSD_STAT_COUNT] = {
 };
 
 #define OSD_TASK_MARGIN                 1
-#define OSD_ELEMENT_MARGIN              4
+#define OSD_ELEMENT_MARGIN              1
 
 // Decay the estimated max task duration by 1/(1 << OSD_EXEC_TIME_SHIFT) on every invocation
-#define OSD_EXEC_TIME_SHIFT             5
+#define OSD_EXEC_TIME_SHIFT             8
 
 // Format a float to the specified number of decimal places with optional rounding.
 // OSD symbols can optionally be placed before and after the formatted number (use SYM_NONE for no symbol).
@@ -1341,9 +1339,7 @@ typedef enum {
     OSD_STATE_UPDATE_ALARMS,
     OSD_STATE_REFRESH_PREARM,
     OSD_STATE_UPDATE_CANVAS,
-    // Elements are handled in two steps, drawing into a buffer, and then sending to the display
-    OSD_STATE_DRAW_ELEMENT,
-    OSD_STATE_DISPLAY_ELEMENT,
+    OSD_STATE_UPDATE_ELEMENTS,
     OSD_STATE_UPDATE_HEARTBEAT,
     OSD_STATE_COMMIT,
     OSD_STATE_TRANSFER,
@@ -1367,10 +1363,7 @@ bool osdUpdateCheck(timeUs_t currentTimeUs, timeDelta_t currentDeltaTimeUs)
 
             // Determine time of next update
             if (osdUpdateDueUs) {
-                // Ensure there's not a flurry of updates to catch up
-                while (cmpTimeUs(osdUpdateDueUs, currentTimeUs) < 0) {
-                    osdUpdateDueUs += OSD_UPDATE_INTERVAL_US;
-                }
+                osdUpdateDueUs += OSD_UPDATE_INTERVAL_US;
             } else {
                 osdUpdateDueUs = currentTimeUs + OSD_UPDATE_INTERVAL_US;
             }
@@ -1385,8 +1378,6 @@ void osdUpdate(timeUs_t currentTimeUs)
 {
     static uint16_t osdStateDurationFractionUs[OSD_STATE_COUNT] = { 0 };
     static uint32_t osdElementDurationFractionUs[OSD_ITEM_COUNT] = { 0 };
-    static bool moreElementsToDraw;
-
     timeUs_t executeTimeUs;
     osdState_e osdCurrentState = osdState;
 
@@ -1507,19 +1498,21 @@ void osdUpdate(timeUs_t currentTimeUs)
         }
 #endif // USE_GPS
 
-        osdSyncBlink(currentTimeUs);
+        osdSyncBlink();
 
-        osdState = OSD_STATE_DRAW_ELEMENT;
+        osdState = OSD_STATE_UPDATE_ELEMENTS;
 
         break;
 
-    case OSD_STATE_DRAW_ELEMENT:
+    case OSD_STATE_UPDATE_ELEMENTS:
         {
+            bool moreElements = true;
+
             uint8_t osdElement = osdGetActiveElement();
 
             timeUs_t startElementTime = micros();
 
-            moreElementsToDraw = osdDrawNextActiveElement(osdDisplayPort);
+            moreElements = osdDrawNextActiveElement(osdDisplayPort, startElementTime);
 
             executeTimeUs = micros() - startElementTime;
 
@@ -1530,14 +1523,7 @@ void osdUpdate(timeUs_t currentTimeUs)
                 osdElementDurationFractionUs[osdElement]--;
             }
 
-            if (osdIsRenderPending()) {
-                osdState = OSD_STATE_DISPLAY_ELEMENT;
-
-                // Render the element just drawn
-                break;
-            }
-
-            if (moreElementsToDraw) {
+            if (moreElements) {
                 // There are more elements to draw
                 break;
             }
@@ -1549,29 +1535,6 @@ void osdUpdate(timeUs_t currentTimeUs)
 #endif // USE_SPEC_PREARM_SCREEN
             {
                 osdState = OSD_STATE_COMMIT;
-            }
-        }
-        break;
-
-    case OSD_STATE_DISPLAY_ELEMENT:
-        {
-            const bool pendingDisplay = osdDisplayActiveElement();
-
-            if (!pendingDisplay) {
-                if (moreElementsToDraw) {
-                    // There is no more to draw so advance to the next element
-                    osdState = OSD_STATE_DRAW_ELEMENT;
-                } else {
-                    // Displaying the current element is complete and there are no futher elements to draw so advance
-#ifdef USE_SPEC_PREARM_SCREEN
-                    if (!ARMING_FLAG(ARMED) && osdConfig()->osd_show_spec_prearm) {
-                        osdState = OSD_STATE_REFRESH_PREARM;
-                    } else
-#endif // USE_SPEC_PREARM_SCREEN
-                    {
-                        osdState = OSD_STATE_COMMIT;
-                    }
-                }
             }
         }
         break;
@@ -1630,7 +1593,7 @@ void osdUpdate(timeUs_t currentTimeUs)
 
     if (osdState == OSD_STATE_IDLE) {
         schedulerSetNextStateTime((osdStateDurationFractionUs[OSD_STATE_CHECK] >> OSD_EXEC_TIME_SHIFT));
-    } else if (osdState == OSD_STATE_DRAW_ELEMENT) {
+    } else if (osdState == OSD_STATE_UPDATE_ELEMENTS) {
         schedulerSetNextStateTime((osdElementDurationFractionUs[osdGetActiveElement()] >> OSD_EXEC_TIME_SHIFT) + OSD_ELEMENT_MARGIN);
     } else {
         schedulerSetNextStateTime((osdStateDurationFractionUs[osdState] >> OSD_EXEC_TIME_SHIFT) + OSD_TASK_MARGIN);
