@@ -33,6 +33,22 @@
 PG_REGISTER_WITH_RESET_TEMPLATE(autopilotConfig_t, autopilotConfig, PG_AUTOPILOT, 2);
 
 PG_RESET_TEMPLATE(autopilotConfig_t, autopilotConfig,
+    .throttle = 1600,
+    .throttleMin = 1300,
+    .throttleMax = 1900,
+
+    .altitudeP = 15,
+    .altitudeI = 15,
+    .altitudeD = 20,
+
+    .altitudeDLpfHz = 10,
+
+    .cogP = 15,
+    .cogI = 15,
+    .cogD = 20,
+
+    .maxRoll = 45,
+    .maxPitch = 45,
 );
 
 #endif // USE_WING

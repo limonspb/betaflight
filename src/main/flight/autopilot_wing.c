@@ -40,24 +40,65 @@
 #include "pg/autopilot.h"
 #include "autopilot.h"
 
+#define ALTITUDE_P_SCALE  0.01f
+#define ALTITUDE_I_SCALE  0.01f
+#define ALTITUDE_D_SCALE  0.01f
+#define POSITION_P_SCALE  0.0012f
+#define POSITION_I_SCALE  0.0001f
+#define POSITION_D_SCALE  0.0015f
+
 float autopilotAngle[RP_AXIS_COUNT];
+
+typedef struct autopilotState_s {
+    gpsLocation_t targetLocation;
+    bool sticksActive;
+    float cogI;
+    float altitudeI;
+    pt2Filter_t altitudeDLpf;
+    float altHoldTaskInvervalS;
+} autopilotState_t;
+
+static autopilotState_t apState = {
+    .cogI = 0.0f,
+    .altitudeI = 0.0f,
+    .sticksActive = false,
+    .altHoldTaskInvervalS = 0.0f,
+};
 
 void resetPositionControl(const gpsLocation_t *initialTargetLocation, unsigned taskRateHz)
 {
-    // from pos_hold.c (or other client) when initiating position hold at target location
+    apState.targetLocation = *initialTargetLocation;
+    apState.sticksActive = false;
+    apState.cogI = 0.0f;
     UNUSED(initialTargetLocation);
     UNUSED(taskRateHz);
 }
 
 void autopilotInit(void)
 {
+    apState.sticksActive = false;
 }
 
 void resetAltitudeControl (void) {
+    apState.altitudeI = 0.0f;
+}
+
+void initAltitudeFiltersIfChanged(float taskIntervalS)
+{
+    if (apState.altHoldTaskInvervalS == taskIntervalS) {
+        return;
+    }
+
+    apState.altHoldTaskInvervalS = taskIntervalS;
+    const float altitudeDLpfCutoff = autopilotConfig()->altitudeDLpfHz;
+    const float altitudeDLpfGain = pt2FilterGain(altitudeDLpfCutoff, taskIntervalS);
+    pt2FilterInit(&apState.altitudeDLpf, altitudeDLpfGain);
 }
 
 void altitudeControl(float targetAltitudeCm, float taskIntervalS, float targetAltitudeStep)
 {
+    initAltitudeFiltersIfChanged(taskIntervalS);
+    const float altitudeErrorCm = targetAltitudeCm - getAltitudeCm();
     UNUSED(targetAltitudeCm);
     UNUSED(taskIntervalS);
     UNUSED(targetAltitudeStep);

@@ -176,6 +176,14 @@
 #define PARAM_NAME_AP_POSITION_CUTOFF "ap_position_cutoff"
 #define PARAM_NAME_AP_MAX_ANGLE "ap_max_angle"
 
+#define PARAM_NAME_AP_THROTTLE "ap_throttle"
+#define PARAM_NAME_AP_ALTITUDE_D_LPF_HZ "ap_altitude_d_lpf_hz"
+#define PARAM_NAME_AP_COG_P "ap_cog_p"
+#define PARAM_NAME_AP_COG_I "ap_cog_i"
+#define PARAM_NAME_AP_COG_D "ap_cog_d"
+#define PARAM_NAME_AP_MAX_ROLL "ap_max_roll"
+#define PARAM_NAME_AP_MAX_PITCH "ap_max_pitch"
+
 #define PARAM_NAME_ANGLE_FEEDFORWARD "angle_feedforward"
 #define PARAM_NAME_ANGLE_FF_SMOOTHING_MS "angle_feedforward_smoothing_ms"
 #define PARAM_NAME_ANGLE_LIMIT "angle_limit"

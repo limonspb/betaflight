@@ -28,7 +28,22 @@
 #include "pg/pg.h"
 
 typedef struct autopilotConfig_s {
-    uint8_t dummy;
+    uint16_t throttle;
+    uint16_t throttleMin;
+    uint16_t throttleMax;
+
+    uint8_t altitudeP;
+    uint8_t altitudeI;
+    uint8_t altitudeD;
+
+    uint8_t altitudeDLpfHz;
+
+    uint8_t cogP;
+    uint8_t cogI;
+    uint8_t cogD;
+
+    uint8_t maxRoll;
+    uint8_t maxPitch;
 } autopilotConfig_t;
 
 PG_DECLARE(autopilotConfig_t, autopilotConfig);
