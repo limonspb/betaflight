@@ -121,6 +121,7 @@ typedef enum {
     PID_YAW,
     PID_LEVEL,
     PID_MAG,
+    PID_HORIZON,
     PID_ITEM_COUNT
 } pidIndex_e;
 

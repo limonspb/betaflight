@@ -563,8 +563,8 @@ static const void *cmsx_profileOtherOnEnter(displayPort_t *pDisp)
     cmsx_angleLimit =         pidProfile->angle_limit;
     cmsx_angleEarthRef =      pidProfile->angle_earth_ref;
 
-    cmsx_horizonStrength =    pidProfile->pid[PID_LEVEL].I;
-    cmsx_horizonLimitSticks = pidProfile->pid[PID_LEVEL].D;
+    cmsx_horizonStrength =    pidProfile->pid[PID_HORIZON].I;
+    cmsx_horizonLimitSticks = pidProfile->pid[PID_HORIZON].D;
     cmsx_horizonLimitDegrees = pidProfile->horizon_limit_degrees;
 
     cmsx_antiGravityGain   = pidProfile->anti_gravity_gain;
@@ -621,8 +621,8 @@ static const void *cmsx_profileOtherOnExit(displayPort_t *pDisp, const OSD_Entry
     pidProfile->angle_limit = cmsx_angleLimit;
     pidProfile->angle_earth_ref = cmsx_angleEarthRef;
 
-    pidProfile->pid[PID_LEVEL].I = cmsx_horizonStrength;
-    pidProfile->pid[PID_LEVEL].D = cmsx_horizonLimitSticks;
+    pidProfile->pid[PID_HORIZON].I = cmsx_horizonStrength;
+    pidProfile->pid[PID_HORIZON].D = cmsx_horizonLimitSticks;
     pidProfile->horizon_limit_degrees = cmsx_horizonLimitDegrees;
 
     pidProfile->anti_gravity_gain   = cmsx_antiGravityGain;

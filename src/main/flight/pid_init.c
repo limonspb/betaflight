@@ -408,11 +408,11 @@ void pidInitConfig(const pidProfile_t *pidProfile)
 #ifdef USE_ACC
     pidRuntime.angleEarthRef = pidProfile->angle_earth_ref / 100.0f;
 #endif
-    pidRuntime.horizonGain = MIN(pidProfile->pid[PID_LEVEL].I / 100.0f, 1.0f);
+    pidRuntime.horizonGain = MIN(pidProfile->pid[PID_HORIZON].I / 100.0f, 1.0f);
     pidRuntime.horizonIgnoreSticks = (pidProfile->horizon_ignore_sticks) ? 1.0f : 0.0f;
 
-    pidRuntime.horizonLimitSticks = pidProfile->pid[PID_LEVEL].D / 100.0f;
-    pidRuntime.horizonLimitSticksInv = (pidProfile->pid[PID_LEVEL].D) ? 1.0f / pidRuntime.horizonLimitSticks : 1.0f;
+    pidRuntime.horizonLimitSticks = pidProfile->pid[PID_HORIZON].D / 100.0f;
+    pidRuntime.horizonLimitSticksInv = (pidProfile->pid[PID_HORIZON].D) ? 1.0f / pidRuntime.horizonLimitSticks : 1.0f;
     pidRuntime.horizonLimitDegrees = (float)pidProfile->horizon_limit_degrees;
     pidRuntime.horizonLimitDegreesInv = (pidProfile->horizon_limit_degrees) ? 1.0f / pidRuntime.horizonLimitDegrees : 1.0f;
 #ifdef USE_ACC

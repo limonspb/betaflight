@@ -1595,6 +1595,9 @@ static bool blackboxWriteSysinfo(void)
                                                                             currentPidProfile->pid[PID_LEVEL].I,
                                                                             currentPidProfile->pid[PID_LEVEL].D);
         BLACKBOX_PRINT_HEADER_LINE("magPID", "%d",                          currentPidProfile->pid[PID_MAG].P);
+        BLACKBOX_PRINT_HEADER_LINE("horizPID", "%d,%d,%d",                  currentPidProfile->pid[PID_HORIZON].P,
+                                                                            currentPidProfile->pid[PID_HORIZON].I,
+                                                                            currentPidProfile->pid[PID_HORIZON].D);
 #ifdef USE_D_MAX
         BLACKBOX_PRINT_HEADER_LINE("d_max", "%d,%d,%d",                     currentPidProfile->d_max[ROLL],
                                                                             currentPidProfile->d_max[PITCH],
