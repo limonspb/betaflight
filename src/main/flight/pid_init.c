@@ -404,6 +404,7 @@ void pidInitConfig(const pidProfile_t *pidProfile)
         pidRuntime.pidCoefficient[FD_YAW].Ki *= 2.5f;
     }
     pidRuntime.angleGain = pidProfile->pid[PID_LEVEL].P / 10.0f;
+    pidRuntime.angleDGain = pidProfile->pid[PID_LEVEL].D / 100.0f;
     pidRuntime.angleFeedforwardGain = pidProfile->pid[PID_LEVEL].F / 100.0f;
 #ifdef USE_ACC
     pidRuntime.angleEarthRef = pidProfile->angle_earth_ref / 100.0f;

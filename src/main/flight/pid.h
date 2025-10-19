@@ -405,7 +405,9 @@ typedef struct pidRuntime_s {
     float antiGravityPGain;
     pidCoefficient_t pidCoefficient[XYZ_AXIS_COUNT];
     float angleGain;
+    float angleDGain;
     float angleFeedforwardGain;
+    // Level-mode D-term uses already-filtered gyro; no extra LPF storage needed
     float horizonGain;
     float horizonLimitSticks;
     float horizonLimitSticksInv;

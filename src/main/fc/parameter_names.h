@@ -183,6 +183,7 @@
 #define PARAM_NAME_S_ROLL "s_roll"
 #define PARAM_NAME_S_YAW "s_yaw"
 #define PARAM_NAME_ANGLE_P_GAIN "angle_p_gain"
+#define PARAM_NAME_ANGLE_D_GAIN "angle_d_gain"
 #define PARAM_NAME_ANGLE_EARTH_REF "angle_earth_ref"
 #define PARAM_NAME_ANGLE_PITCH_OFFSET "angle_pitch_offset"
 

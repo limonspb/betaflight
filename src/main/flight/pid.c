@@ -596,6 +596,13 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
     const float currentAngle = (attitude.raw[axis] - angleTrim->raw[axis]) / 10.0f; // stepped at 500hz with some 4ms flat spots
     const float errorAngle = angleTarget - currentAngle;
     float angleRate = errorAngle * pidRuntime.angleGain + angleFeedforward;
+    // Add D-term as pure damping using measured angle rate (gyro), filtered through PT1 LPF in pidRuntime (wings only)
+#ifdef USE_WING
+    const float angleRateMeasured = gyro.gyroADCf[axis]; // degrees/second (already filtered)
+    float angleDterm = -pidRuntime.angleDGain * angleRateMeasured;
+    angleRate += angleDterm;
+#endif
+
 
     // minimise cross-axis wobble due to faster yaw responses than roll or pitch, and make co-ordinated yaw turns
     // by compensating for the effect of yaw on roll while pitched, and on pitch while rolled
@@ -623,6 +630,10 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
         DEBUG_SET(DEBUG_ANGLE_MODE, 1, lrintf(errorAngle * pidRuntime.angleGain * 10.0f)); // un-smoothed error correction in degrees
         DEBUG_SET(DEBUG_ANGLE_MODE, 2, lrintf(angleFeedforward * 10.0f)); // feedforward amount in degrees
         DEBUG_SET(DEBUG_ANGLE_MODE, 3, lrintf(currentAngle * 10.0f)); // angle returned
+        // Log angle D-term contribution (degrees), wings only
+#ifdef USE_WING
+        DEBUG_SET(DEBUG_ANGLE_MODE, 4, lrintf(angleDterm * 10.0f));
+#endif
 
         DEBUG_SET(DEBUG_ANGLE_TARGET, 0, lrintf(angleTarget * 10.0f));
         DEBUG_SET(DEBUG_ANGLE_TARGET, 1, lrintf(sinAngle * 10.0f)); // modification factor from earthRef
