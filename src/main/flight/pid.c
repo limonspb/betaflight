@@ -269,6 +269,12 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .chirp_frequency_end_deci_hz = 6000,
         .chirp_time_seconds = 20,
     );
+
+#ifdef USE_WING
+    // Set per-axis Angle PID defaults for wings outside of RESET_CONFIG macro
+    pidProfile->pid[PID_LEVEL_ROLL] = (pidf_t){ 50, 0, 0, 50, 0 };
+    pidProfile->pid[PID_LEVEL_PITCH] = (pidf_t){ 50, 0, 0, 50, 0 };
+#endif
 }
 
 static bool isTpaActive(tpaMode_e tpaMode, term_e term) {
@@ -556,11 +562,21 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
     // We now use Acro Rates, transformed into the range +/- 1, to provide setpoints
     float angleLimit = pidProfile->angle_limit;
     float angleFeedforward = 0.0f;
+#ifdef USE_WING
+    const int rpIndex = (axis == FD_ROLL) ? 0 : 1;
+    const float anglePGain = pidRuntime.angleGainRP[rpIndex];
+    const float angleFFGain = pidRuntime.angleFeedforwardGainRP[rpIndex];
+    const float angleDGain = pidRuntime.angleDGainRP[rpIndex];
+#else
+    const float anglePGain = pidRuntime.angleGain;
+    const float angleFFGain = pidRuntime.angleFeedforwardGain;
+    const float angleDGain = pidRuntime.angleDGain;
+#endif
     // if user changes rates profile, update the max setpoint for angle mode
     const float maxSetpointRateInv = 1.0f / getMaxRcRate(axis);
 
 #ifdef USE_FEEDFORWARD
-    angleFeedforward = angleLimit * getFeedforward(axis) * pidRuntime.angleFeedforwardGain * maxSetpointRateInv;
+    angleFeedforward = angleLimit * getFeedforward(axis) * angleFFGain * maxSetpointRateInv;
     //  angle feedforward must be heavily filtered, at the PID loop rate, with limited user control over time constant
     // it MUST be very delayed to avoid early overshoot and being too aggressive
     angleFeedforward = pt3FilterApply(&pidRuntime.angleFeedforwardPt3[axis], angleFeedforward);
@@ -595,11 +611,11 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
 
     const float currentAngle = (attitude.raw[axis] - angleTrim->raw[axis]) / 10.0f; // stepped at 500hz with some 4ms flat spots
     const float errorAngle = angleTarget - currentAngle;
-    float angleRate = errorAngle * pidRuntime.angleGain + angleFeedforward;
+    float angleRate = errorAngle * anglePGain + angleFeedforward;
     // Add D-term as pure damping using measured angle rate (gyro), filtered through PT1 LPF in pidRuntime (wings only)
 #ifdef USE_WING
     const float angleRateMeasured = gyro.gyroADCf[axis]; // degrees/second (already filtered)
-    float angleDterm = -pidRuntime.angleDGain * angleRateMeasured;
+    float angleDterm = -angleDGain * angleRateMeasured;
     angleRate += angleDterm;
 #endif
 
@@ -627,7 +643,7 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
     //logging
     if (axis == FD_ROLL) {
         DEBUG_SET(DEBUG_ANGLE_MODE, 0, lrintf(angleTarget * 10.0f)); // target angle
-        DEBUG_SET(DEBUG_ANGLE_MODE, 1, lrintf(errorAngle * pidRuntime.angleGain * 10.0f)); // un-smoothed error correction in degrees
+        DEBUG_SET(DEBUG_ANGLE_MODE, 1, lrintf(errorAngle * anglePGain * 10.0f)); // un-smoothed error correction in degrees
         DEBUG_SET(DEBUG_ANGLE_MODE, 2, lrintf(angleFeedforward * 10.0f)); // feedforward amount in degrees
         DEBUG_SET(DEBUG_ANGLE_MODE, 3, lrintf(currentAngle * 10.0f)); // angle returned
         // Log angle D-term contribution (degrees), wings only
@@ -660,7 +676,12 @@ static FAST_CODE_NOINLINE void handleCrashRecovery(
             if (sensors(SENSOR_ACC)) {
                 // errorAngle is deviation from horizontal
                 const float errorAngle =  -(attitude.raw[axis] - angleTrim->raw[axis]) / 10.0f;
+#ifdef USE_WING
+                const int rpIndexCR = (axis == FD_ROLL) ? 0 : 1;
+                *currentPidSetpoint = errorAngle * pidRuntime.angleGainRP[rpIndexCR];
+#else
                 *currentPidSetpoint = errorAngle * pidRuntime.angleGain;
+#endif
                 *errorRate = *currentPidSetpoint - gyroRate;
             }
         }

@@ -310,7 +310,7 @@ void pidInitFilters(const pidProfile_t *pidProfile)
         pt1FilterInit(&pidRuntime.horizonSmoothingPt1, kHorizon);
     }
 
-    for (int axis = 0; axis < 2; axis++) {  // ROLL and PITCH only
+    for (int axis = 0; axis < RP_AXIS_COUNT; axis++) {  // ROLL and PITCH only
         pt3FilterInit(&pidRuntime.attitudeFilter[axis], k);
         pt3FilterInit(&pidRuntime.angleFeedforwardPt3[axis], k2);
     }
@@ -403,9 +403,19 @@ void pidInitConfig(const pidProfile_t *pidProfile)
     {
         pidRuntime.pidCoefficient[FD_YAW].Ki *= 2.5f;
     }
+#ifdef USE_WING
+    // Per-axis level-mode gains: [0]=ROLL, [1]=PITCH sourced from pid[PID_LEVEL_ROLL/PITCH]
+    pidRuntime.angleGainRP[0] = pidProfile->pid[PID_LEVEL_ROLL].P / 10.0f;
+    pidRuntime.angleGainRP[1] = pidProfile->pid[PID_LEVEL_PITCH].P / 10.0f;
+    pidRuntime.angleDGainRP[0] = pidProfile->pid[PID_LEVEL_ROLL].D / 100.0f;
+    pidRuntime.angleDGainRP[1] = pidProfile->pid[PID_LEVEL_PITCH].D / 100.0f;
+    pidRuntime.angleFeedforwardGainRP[0] = pidProfile->pid[PID_LEVEL_ROLL].F / 100.0f;
+    pidRuntime.angleFeedforwardGainRP[1] = pidProfile->pid[PID_LEVEL_PITCH].F / 100.0f;
+#else
     pidRuntime.angleGain = pidProfile->pid[PID_LEVEL].P / 10.0f;
     pidRuntime.angleDGain = pidProfile->pid[PID_LEVEL].D / 100.0f;
     pidRuntime.angleFeedforwardGain = pidProfile->pid[PID_LEVEL].F / 100.0f;
+#endif
 #ifdef USE_ACC
     pidRuntime.angleEarthRef = pidProfile->angle_earth_ref / 100.0f;
 #endif

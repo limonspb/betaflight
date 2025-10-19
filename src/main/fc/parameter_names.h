@@ -182,8 +182,17 @@
 #define PARAM_NAME_S_PITCH "s_pitch"
 #define PARAM_NAME_S_ROLL "s_roll"
 #define PARAM_NAME_S_YAW "s_yaw"
+#ifndef USE_WING
 #define PARAM_NAME_ANGLE_P_GAIN "angle_p_gain"
 #define PARAM_NAME_ANGLE_D_GAIN "angle_d_gain"
+#else
+#define PARAM_NAME_ANGLE_P_GAIN_ROLL   "angle_p_gain_roll"
+#define PARAM_NAME_ANGLE_D_GAIN_ROLL   "angle_d_gain_roll"
+#define PARAM_NAME_ANGLE_FF_ROLL       "angle_feedforward_roll"
+#define PARAM_NAME_ANGLE_P_GAIN_PITCH  "angle_p_gain_pitch"
+#define PARAM_NAME_ANGLE_D_GAIN_PITCH  "angle_d_gain_pitch"
+#define PARAM_NAME_ANGLE_FF_PITCH      "angle_feedforward_pitch"
+#endif
 #define PARAM_NAME_ANGLE_EARTH_REF "angle_earth_ref"
 #define PARAM_NAME_ANGLE_PITCH_OFFSET "angle_pitch_offset"
 

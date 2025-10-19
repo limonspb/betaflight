@@ -120,6 +120,10 @@ typedef enum {
     PID_PITCH,
     PID_YAW,
     PID_LEVEL,
+#ifdef USE_WING
+    PID_LEVEL_ROLL,
+    PID_LEVEL_PITCH,
+#endif
     PID_MAG,
     PID_HORIZON,
     PID_ITEM_COUNT
@@ -404,9 +408,16 @@ typedef struct pidRuntime_s {
     uint8_t antiGravityGain;
     float antiGravityPGain;
     pidCoefficient_t pidCoefficient[XYZ_AXIS_COUNT];
+    // Level mode gains
+#ifdef USE_WING
+    float angleGainRP[RP_AXIS_COUNT];            // [0]=ROLL, [1]=PITCH
+    float angleDGainRP[RP_AXIS_COUNT];
+    float angleFeedforwardGainRP[RP_AXIS_COUNT];
+#else
     float angleGain;
     float angleDGain;
     float angleFeedforwardGain;
+#endif
     // Level-mode D-term uses already-filtered gyro; no extra LPF storage needed
     float horizonGain;
     float horizonLimitSticks;
