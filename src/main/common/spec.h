@@ -38,6 +38,7 @@ typedef enum {
     SPEC_MAYHEM,
     SPEC_TT,
     SPEC_LLIGUETA,
+    SPEC_JOE,
     SPEC_COUNT // must be last
 } SpecType;
 
