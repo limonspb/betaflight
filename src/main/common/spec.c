@@ -218,4 +218,33 @@ specSettings_t specArray[] = {
         }
     },
 
+    {
+        "JOE SPEC 21K", // Name
+        true,    // bool rpm_limit;
+        25,      // uint16_t rpm_limit_p;
+        10,      // uint16_t rpm_limit_i;
+        8,       // uint16_t rpm_limit_d;
+        21000,   // uint16_t rpm_limit_value;
+        14,      // uint8_t motorPoleCount;
+        1980,    // uint16_t kv;
+
+        {   // Logo groups
+            { "JS ",
+              "   ",
+              "   " },
+
+            { " J ",
+              " S ",
+              "   " },
+
+            { "   ",
+              "JS ",
+              "   " },
+
+            { "J  ",
+              "S  ",
+              "   " },
+        }
+    },
+
 };
