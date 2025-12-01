@@ -39,20 +39,44 @@
 
 #include "alt_hold.h"
 
+static const float taskIntervalSeconds = HZ_TO_INTERVAL(ALTHOLD_TASK_RATE_HZ);
+
+typedef struct {
+    bool isActive;
+    float targetAltitudeCm;
+} altHoldState_t;
+
+altHoldState_t altHold;
+
 LOCAL_UNUSED_FUNCTION static void altHoldReset(void)
 {
+    resetAltitudeControl();
+    altHold.targetAltitudeCm = getAltitudeCm();
+    altHold.targetVelocity = 0.0f;
 }
 
 void altHoldInit(void)
 {
+    altHold.isActive = false;
+    altHold.deadband = 0;
+    altHold.allowStickAdjustment = false;
+    altHold.maxVelocity = 0;
+    altHoldReset();
 }
 
 void updateAltHold(timeUs_t currentTimeUs) {
     UNUSED(currentTimeUs);
+
+    // check for enabling Alt Hold, otherwise do as little as possible while inactive
+    altHoldProcessTransitions();
+
+    if (altHold.isActive) {
+        altHoldUpdate();
+    }
 }
 
 bool isAltHoldActive(void) {
-    return false;
+    return altHold.isActive;
 }
 
 #endif // USE_ALTITUDE_HOLD

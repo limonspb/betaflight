@@ -552,6 +552,21 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float calcHorizonLevelStrength(void)
     // 1 means full levelling, 0 means none
 }
 
+#ifdef USE_WING
+FAST_CODE_NOINLINE float wingAngleTarget(float sticksAngleTarget, int axis, const pidProfile_t *pidProfile)
+{
+    float angleTarget = sticksAngleTarget;
+    if (axis == FD_PITCH) {
+        angleTarget += (float)pidProfile->angle_pitch_offset / 10.0f;
+    }
+
+    if (autopilotInControl()) {
+        angleTarget += autopilotAngle[axis];
+    }
+    return angleTarget;
+}
+#endif
+
 // Use the FAST_CODE_NOINLINE directive to avoid this code from being inlined into ITCM RAM to avoid overflow.
 // The impact is possibly slightly slower performance on F7/H7 but they have more than enough
 // processing power that it should be a non-issue.
@@ -586,12 +601,11 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
     // use acro rates for the angle target in both horizon and angle modes, converted to -1 to +1 range using maxRate
 
 #ifdef USE_WING
-    if (axis == FD_PITCH) {
-        angleTarget += (float)pidProfile->angle_pitch_offset / 10.0f;
-    }
+    angleTarget = wingAngleTarget(angleTarget, axis, pidProfile);
+    angleFeedforward = 0.0f; // ff for angle for wings - investigate for future
 #endif // USE_WING
 
-#ifdef USE_GPS_RESCUE
+#ifdef USE_GPS_RESCUE && !defined(USE_WING)
     angleTarget += gpsRescueAngle[axis] / 100.0f; // Angle is in centidegrees, stepped on roll at 10Hz but not on pitch
 #endif
 #if defined(USE_POSITION_HOLD) && !defined(USE_WING)

@@ -42,6 +42,14 @@
 
 float autopilotAngle[RP_AXIS_COUNT];
 
+static float throttleOut = 0.0f;
+
+static pidCoefficient_t rollPidCoeffs;
+static pidCoefficient_t pitchPidCoeffs;
+
+static float rollI = 0.0f;
+static float pitchI = 0.0f;
+
 void resetPositionControl(const gpsLocation_t *initialTargetLocation, unsigned taskRateHz)
 {
     // from pos_hold.c (or other client) when initiating position hold at target location
