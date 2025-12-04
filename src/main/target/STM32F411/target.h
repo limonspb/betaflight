@@ -84,8 +84,4 @@
 
 #define USE_PID_DENOM_CHECK
 
-#ifdef USE_LED_STRIP_64
-#error USE_LED_STRIP_64 is not supported for this MCU, please use USE_LED_STRIP
-#endif
-
 #define FLASH_PAGE_SIZE ((uint32_t)0x4000) // 16K sectors
