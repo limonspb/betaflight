@@ -26,6 +26,22 @@
 typedef struct gpsRescue_s {
     uint8_t  allowArmingWithoutFix;
     uint8_t  minSats;
+    uint16_t returnAltitudeM;
+    uint16_t initialClimbM;
+    uint16_t descentDistanceM;
+    uint16_t descendRate;           // cm/s
+    uint16_t minStartDistM;
+    uint8_t  maxRescueAngle;        // degrees
+    uint8_t  altP, altI, altD;
+    uint8_t  cogP, cogI, cogD;
+    uint8_t  rollPitchMix;          // percent
+    uint8_t  rollYawMix;            // percent
+    uint8_t  sanityChecks;
+    uint8_t  disarmThreshold;       // accelerometer threshold * 10
+    uint8_t  landingAltM;
+    uint16_t landingApproachDistM;
+    uint8_t  loiterAltM;            // 0 = skip loiter
+    uint16_t loiterSeconds;         // 0 = skip loiter
 } gpsRescueConfig_t;
 
 PG_DECLARE(gpsRescueConfig_t, gpsRescueConfig);

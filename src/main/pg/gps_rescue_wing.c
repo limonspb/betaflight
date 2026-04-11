@@ -28,11 +28,31 @@
 
 #include "gps_rescue.h"
 
-PG_REGISTER_WITH_RESET_TEMPLATE(gpsRescueConfig_t, gpsRescueConfig, PG_GPS_RESCUE, 7);
+PG_REGISTER_WITH_RESET_TEMPLATE(gpsRescueConfig_t, gpsRescueConfig, PG_GPS_RESCUE, 8);
 
 PG_RESET_TEMPLATE(gpsRescueConfig_t, gpsRescueConfig,
     .allowArmingWithoutFix = false,
     .minSats = 8,
+    .returnAltitudeM = 30,
+    .initialClimbM = 10,
+    .descentDistanceM = 20,
+    .descendRate = 150,
+    .minStartDistM = 15,
+    .maxRescueAngle = 45,
+    .altP = 15,
+    .altI = 15,
+    .altD = 20,
+    .cogP = 15,
+    .cogI = 15,
+    .cogD = 20,
+    .rollPitchMix = 0,
+    .rollYawMix = 0,
+    .sanityChecks = RESCUE_SANITY_FS_ONLY,
+    .disarmThreshold = 30,
+    .landingAltM = 12,
+    .landingApproachDistM = 130,
+    .loiterAltM = 60,
+    .loiterSeconds = 60,
 );
 
 #endif // USE_GPS_RESCUE

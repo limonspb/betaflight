@@ -296,6 +296,21 @@
 #define PARAM_NAME_GPS_RESCUE_USE_MAG "gps_rescue_use_mag"
 #endif // USE_MAG
 
+#ifdef USE_WING
+#define PARAM_NAME_GPS_RESCUE_ALT_P "gps_rescue_alt_p"
+#define PARAM_NAME_GPS_RESCUE_ALT_I "gps_rescue_alt_i"
+#define PARAM_NAME_GPS_RESCUE_ALT_D "gps_rescue_alt_d"
+#define PARAM_NAME_GPS_RESCUE_COG_P "gps_rescue_cog_p"
+#define PARAM_NAME_GPS_RESCUE_COG_I "gps_rescue_cog_i"
+#define PARAM_NAME_GPS_RESCUE_COG_D "gps_rescue_cog_d"
+#define PARAM_NAME_GPS_RESCUE_ROLL_PITCH_MIX "gps_rescue_roll_pitch_mix"
+#define PARAM_NAME_GPS_RESCUE_ROLL_YAW_MIX "gps_rescue_roll_yaw_mix"
+#define PARAM_NAME_GPS_RESCUE_LANDING_ALT "gps_rescue_landing_alt"
+#define PARAM_NAME_GPS_RESCUE_LANDING_APPROACH_DIST "gps_rescue_landing_approach_dist"
+#define PARAM_NAME_GPS_RESCUE_LOITER_ALT "gps_rescue_loiter_alt"
+#define PARAM_NAME_GPS_RESCUE_LOITER_SECONDS "gps_rescue_loiter_seconds"
+#endif // USE_WING
+
 #endif // USE_GPS_RESCUE
 
 #ifdef USE_GPS_LAP_TIMER
