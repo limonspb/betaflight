@@ -314,6 +314,10 @@
 
 #ifdef USE_WING
 #define PARAM_NAME_AP_CRUISE_THROTTLE "ap_cruise_throttle"
+#define PARAM_NAME_AP_COG_P "ap_cog_p"
+#define PARAM_NAME_AP_COG_I "ap_cog_i"
+#define PARAM_NAME_AP_COG_D "ap_cog_d"
+#define PARAM_NAME_AP_ROLL_PITCH_MIX "ap_roll_pitch_mix"
 #endif
 
 #ifdef USE_POSITION_HOLD

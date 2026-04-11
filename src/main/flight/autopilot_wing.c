@@ -29,6 +29,7 @@
 #include "common/axis.h"
 #include "common/filter.h"
 #include "common/maths.h"
+#include "common/time.h"
 
 #include "fc/rc.h"
 #include "fc/runtime_config.h"
@@ -37,16 +38,17 @@
 #include "flight/pid.h"
 #include "flight/position.h"
 
+#include "io/gps.h"
 #include "rx/rx.h"
 
-#include "sensors/battery.h"
-
 #include "pg/autopilot.h"
+
+#include "sensors/battery.h"
 
 #include "alt_hold.h"
 #include "autopilot.h"
 
-// Altitude PID scale factors 
+// Altitude PID scale factors
 #define ALT_P_SCALE   0.1f
 #define ALT_I_SCALE   0.01f
 #define ALT_D_SCALE   0.1f
@@ -54,13 +56,31 @@
 #define ALT_I_RESET_ERROR_M 15.0f   // reset I-term when altitude error exceeds this (meters)
 #define ALT_D_CUTOFF_HZ 0.75f       // PT2 filter cutoff for D term
 
+// Course PID scale factors
+#define COG_P_SCALE   0.1f
+#define COG_I_SCALE   0.001f
+#define COG_D_SCALE   0.1f
+#define COG_I_WINDUP_LIMIT 15.0f    // degrees, max I-term contribution
+#define COG_I_RESET_ERROR_DEG 20.0f // reset I-term when course error exceeds this
+
 float autopilotAngle[RP_AXIS_COUNT];
 
+// Altitude PID state
 static float altI = 0.0f;
 static float previousAltitudeError = 0.0f;
 static pt2Filter_t altDLpf;
 static float throttleOut = 0.0f;
 static bool sticksActive = false;
+static bool throttleCut = false;
+
+// Course PID state
+static float courseI = 0.0f;
+static float previousCourseError = 0.0f;
+static gpsLocation_t targetPosition;
+static uint16_t gpsStamp = 0;
+// Altitude priority state
+static float prevPitch = 0.0f;
+static timeUs_t lastPitchJumpTime = 0;
 
 void autopilotInit(void)
 {
@@ -72,6 +92,11 @@ void autopilotInit(void)
     previousAltitudeError = 0.0f;
     throttleOut = 0.0f;
     sticksActive = false;
+    throttleCut = false;
+    courseI = 0.0f;
+    previousCourseError = 0.0f;
+    prevPitch = 0.0f;
+    lastPitchJumpTime = 0;
     autopilotAngle[AI_ROLL] = 0.0f;
     autopilotAngle[AI_PITCH] = 0.0f;
 }
@@ -131,11 +156,85 @@ void setSticksActiveStatus(bool areSticksActive)
 void resetPositionControl(unsigned taskRateHz)
 {
     UNUSED(taskRateHz);
+    courseI = 0.0f;
+    previousCourseError = 0.0f;
+    prevPitch = 0.0f;
+    lastPitchJumpTime = micros();
+    autopilotAngle[AI_ROLL] = 0.0f;
+    // Save current GPS position as target
+    targetPosition = gpsSol.llh;
+    gpsStamp = 0;
 }
 
 bool positionControl(void)
 {
-    return false;
+    if (!gpsHasNewData(&gpsStamp)) {
+        return true; // keep last values until next GPS update
+    }
+
+    // Calculate bearing and distance from current position to target
+    uint32_t distCm;
+    int32_t bearingCdeg; // centidegrees (hundredths of degree)
+    GPS_distance_cm_bearing(&gpsSol.llh, &targetPosition, false, &distCm, &bearingCdeg);
+
+    // Convert bearing to decidegrees for comparison with gpsSol.groundCourse
+    const float desiredCourseDdeg = (float)bearingCdeg / 10.0f;
+
+    // Course error in degrees
+    float courseError = (desiredCourseDdeg - (float)gpsSol.groundCourse) / 10.0f;
+    if (courseError > 180.0f) {
+        courseError -= 360.0f;
+    }
+    if (courseError < -180.0f) {
+        courseError += 360.0f;
+    }
+
+    // Anti-oscillation: reject sudden large COG jumps between GPS ticks
+    if (fabsf(courseError - previousCourseError) > 270.0f) {
+        courseError = previousCourseError;
+    }
+
+    const float gpsInterval = fmaxf(getGpsDataIntervalSeconds(), 0.01f);
+    const autopilotConfig_t *cfg = autopilotConfig();
+
+    // P term
+    const float courseP = COG_P_SCALE * cfg->cogP * courseError;
+
+    // I term with reset when course error is large
+    courseI += COG_I_SCALE * cfg->cogI * courseError * gpsInterval;
+    courseI = constrainf(courseI, -COG_I_WINDUP_LIMIT, COG_I_WINDUP_LIMIT);
+    if (fabsf(courseError) > COG_I_RESET_ERROR_DEG) {
+        courseI = 0.0f;
+    }
+
+    // D term
+    float courseD = (courseError - previousCourseError) / gpsInterval;
+    previousCourseError = courseError;
+    courseD *= COG_D_SCALE * cfg->cogD;
+
+    float rollDegrees = courseP + courseI + courseD;
+    rollDegrees = constrainf(rollDegrees, -(float)cfg->maxAngle, (float)cfg->maxAngle);
+
+    // Altitude priority — suppress roll during large pitch transients
+    const float currentPitch = autopilotAngle[AI_PITCH];
+    if (fabsf(currentPitch - prevPitch) > 45.0f) {
+        lastPitchJumpTime = micros();
+    }
+    prevPitch = currentPitch;
+
+    if (cmpTimeUs(micros(), lastPitchJumpTime) < 1000000 || fabsf(currentPitch) > 45.0f) {
+        rollDegrees = 0.0f;
+        courseI = 0.0f;
+    }
+
+    autopilotAngle[AI_ROLL] = rollDegrees;
+
+    DEBUG_SET(DEBUG_AUTOPILOT_POSITION, 0, lrintf(courseError * 100));
+    DEBUG_SET(DEBUG_AUTOPILOT_POSITION, 1, lrintf(rollDegrees * 100));
+    DEBUG_SET(DEBUG_AUTOPILOT_POSITION, 2, lrintf(distCm / 100.0f));
+    DEBUG_SET(DEBUG_AUTOPILOT_POSITION, 3, lrintf(desiredCourseDdeg));
+
+    return true;
 }
 
 bool isBelowLandingAltitude(void)
@@ -145,11 +244,16 @@ bool isBelowLandingAltitude(void)
 
 float getAutopilotThrottle(void)
 {
+    if (throttleCut) {
+        throttleOut = 0.0f;
+        return 0.0f;
+    }
+
     const autopilotConfig_t *apCfg = autopilotConfig();
     float commandedThrottle = scaleRangef(apCfg->cruiseThrottle,
         MAX(rxConfig()->mincheck, PWM_RANGE_MIN), PWM_RANGE_MAX, 0.0f, 1.0f);
 
-    // Battery voltage compensation ()
+    // Battery voltage compensation
     if (pidRuntime.tpaSpeed.maxVoltage > 0.0f) {
         float batteryFactor = getBatteryVoltageLatest() / 100.0f / pidRuntime.tpaSpeed.maxVoltage;
         batteryFactor = constrainf(batteryFactor, 0.5f, 1.0f);
@@ -157,7 +261,7 @@ float getAutopilotThrottle(void)
     }
     commandedThrottle = constrainf(commandedThrottle, 0.0f, 1.0f);
 
-    // Pitch-angle gravity compensation ()
+    // Pitch-angle gravity compensation
     // When climbing (nose up, sinPitch < 0 in BF convention): need more throttle
     // When descending (nose down, sinPitch > 0): need less throttle
     const float twr = pidRuntime.tpaSpeed.twr;
@@ -178,5 +282,12 @@ bool isAutopilotInControl(void)
 {
     return !sticksActive;
 }
+
+#ifdef USE_GPS_RESCUE
+void setThrottleCut(bool cut)
+{
+    throttleCut = cut;
+}
+#endif // USE_GPS_RESCUE
 
 #endif // USE_WING

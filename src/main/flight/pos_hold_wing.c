@@ -15,41 +15,97 @@
  * along with Betaflight. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
+
 #include "platform.h"
 
 #ifdef USE_WING
 
 #ifdef USE_POSITION_HOLD
 
-#include "math.h"
 #include "build/debug.h"
+
 #include "common/maths.h"
 
 #include "config/config.h"
+
 #include "fc/core.h"
-#include "fc/runtime_config.h"
 #include "fc/rc.h"
+#include "fc/rc_controls.h"
+#include "fc/runtime_config.h"
+
 #include "flight/autopilot.h"
 #include "flight/failsafe.h"
-#include "flight/imu.h"
 #include "flight/position.h"
+
+#include "io/gps.h"
+
 #include "rx/rx.h"
-#include "sensors/compass.h"
 
 #include "pg/pos_hold.h"
+
 #include "pos_hold.h"
+
+typedef struct {
+    bool isEnabled;
+    bool sticksWereActive;
+    float deadband;
+} posHoldState_t;
+
+static posHoldState_t posHold;
 
 void posHoldInit(void)
 {
+    posHold.isEnabled = false;
+    posHold.deadband = posHoldConfig()->deadband / 100.0f;
+    posHold.sticksWereActive = false;
 }
 
-void updatePosHold(timeUs_t currentTimeUs) {
+static void posHoldCheckSticks(void)
+{
+    if (failsafeIsActive()) {
+        setSticksActiveStatus(false);
+        return;
+    }
+
+    const bool sticksDeflected = getRcDeflectionAbs(FD_ROLL) > posHold.deadband;
+    setSticksActiveStatus(sticksDeflected);
+
+    // When sticks return to center, update target position
+    if (posHold.sticksWereActive && !sticksDeflected) {
+        resetPositionControl(POSHOLD_TASK_RATE_HZ);
+    }
+    posHold.sticksWereActive = sticksDeflected;
+}
+
+void updatePosHold(timeUs_t currentTimeUs)
+{
     UNUSED(currentTimeUs);
+
+    if (FLIGHT_MODE(POS_HOLD_MODE)) {
+        if (!posHold.isEnabled) {
+            resetPositionControl(POSHOLD_TASK_RATE_HZ);
+            posHold.isEnabled = true;
+        }
+    } else {
+        if (posHold.isEnabled) {
+            autopilotAngle[AI_ROLL] = 0.0f;
+            setSticksActiveStatus(false);
+        }
+        posHold.isEnabled = false;
+    }
+
+    if (posHold.isEnabled) {
+        posHoldCheckSticks();
+        if (isAutopilotInControl()) {
+            positionControl();
+        }
+    }
 }
 
-bool posHoldFailure(void) {
-    // used only to display warning in OSD if requested but failing
-    return true;
+bool posHoldFailure(void)
+{
+    return FLIGHT_MODE(POS_HOLD_MODE) && !gpsIsHealthy();
 }
 
 #endif // USE_POSITION_HOLD

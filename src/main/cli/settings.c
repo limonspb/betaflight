@@ -1177,6 +1177,8 @@ const clivalue_t valueTable[] = {
     { "poshold_position_source",       VAR_UINT8 | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_POSHOLD_SOURCE }, PG_POSHOLD_CONFIG, offsetof(posHoldConfig_t, positionSource) },
     { "poshold_opticalflow_quality_min", VAR_UINT8 | MASTER_VALUE, .config.minmaxUnsigned = { 0, 100 }, PG_POSHOLD_CONFIG, offsetof(posHoldConfig_t, opticalflowQualityMin) },
     { "poshold_opticalflow_max_range", VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 50, 1000 }, PG_POSHOLD_CONFIG, offsetof(posHoldConfig_t, opticalflowMaxRange) },
+#else // USE_WING
+    { PARAM_NAME_POS_HOLD_DEADBAND,    VAR_UINT8 | MASTER_VALUE, .config.minmaxUnsigned = { 0, 50 }, PG_POSHOLD_CONFIG, offsetof(posHoldConfig_t, deadband) },
 #endif // !USE_WING
 #endif // USE_POSITION_HOLD
 
@@ -2055,8 +2057,13 @@ const clivalue_t valueTable[] = {
     { PARAM_NAME_AP_ALTITUDE_P,          VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 200 },      PG_AUTOPILOT, offsetof(autopilotConfig_t, altitudeP) },
     { PARAM_NAME_AP_ALTITUDE_I,          VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 200 },      PG_AUTOPILOT, offsetof(autopilotConfig_t, altitudeI) },
     { PARAM_NAME_AP_ALTITUDE_D,          VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 200 },      PG_AUTOPILOT, offsetof(autopilotConfig_t, altitudeD) },
+    { PARAM_NAME_AP_MAX_ANGLE,           VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 10, 65 },      PG_AUTOPILOT, offsetof(autopilotConfig_t, maxAngle) },
     { PARAM_NAME_AP_LANDING_ALTITUDE_M,  VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 200 },      PG_AUTOPILOT, offsetof(autopilotConfig_t, landingAltitudeM) },
     { PARAM_NAME_AP_CRUISE_THROTTLE,     VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 1000, 2000 },  PG_AUTOPILOT, offsetof(autopilotConfig_t, cruiseThrottle) },
+    { PARAM_NAME_AP_COG_P,               VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 200 },      PG_AUTOPILOT, offsetof(autopilotConfig_t, cogP) },
+    { PARAM_NAME_AP_COG_I,               VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 200 },      PG_AUTOPILOT, offsetof(autopilotConfig_t, cogI) },
+    { PARAM_NAME_AP_COG_D,               VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 200 },      PG_AUTOPILOT, offsetof(autopilotConfig_t, cogD) },
+    { PARAM_NAME_AP_ROLL_PITCH_MIX,      VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 100 },      PG_AUTOPILOT, offsetof(autopilotConfig_t, rollPitchMix) },
 #endif // USE_WING
 
 // PG_MODE_ACTIVATION_CONFIG

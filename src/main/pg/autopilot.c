@@ -28,7 +28,7 @@
 
 #include "autopilot.h"
 
-PG_REGISTER_WITH_RESET_TEMPLATE(autopilotConfig_t, autopilotConfig, PG_AUTOPILOT, 7);
+PG_REGISTER_WITH_RESET_TEMPLATE(autopilotConfig_t, autopilotConfig, PG_AUTOPILOT, 8);
 
 PG_RESET_TEMPLATE(autopilotConfig_t, autopilotConfig,
     .landingAltitudeM = 4,
@@ -105,4 +105,8 @@ PG_RESET_TEMPLATE(autopilotConfig_t, autopilotConfig,
 
     // Wing-specific parameters
     .cruiseThrottle = 1400,               // 1400 PWM cruise throttle
+    .cogP = 15,                           // Course-over-ground P gain
+    .cogI = 15,                           // Course-over-ground I gain
+    .cogD = 20,                           // Course-over-ground D gain
+    .rollPitchMix = 50,                   // 50% altitude compensation during banking
 );

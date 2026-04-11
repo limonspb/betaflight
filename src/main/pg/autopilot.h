@@ -125,6 +125,10 @@ typedef struct autopilotConfig_s {
 
     // Wing-specific parameters
     uint16_t cruiseThrottle;          // wing cruise throttle PWM value (like hoverThrottle for MR)
+    uint8_t cogP;                     // wing course-over-ground P gain
+    uint8_t cogI;                     // wing course-over-ground I gain
+    uint8_t cogD;                     // wing course-over-ground D gain
+    uint8_t rollPitchMix;             // altitude compensation during banking (0-100%)
 } autopilotConfig_t;
 
 PG_DECLARE(autopilotConfig_t, autopilotConfig);

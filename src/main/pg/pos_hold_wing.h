@@ -28,9 +28,9 @@
 #include "pg/pg.h"
 
 typedef struct posHoldConfig_s {
-    uint8_t dummy;
+    uint8_t deadband;       // roll stick deadband percentage (0-50)
 } posHoldConfig_t;
 
 PG_DECLARE(posHoldConfig_t, posHoldConfig);
 
-#endif // !USE_WING
+#endif // USE_WING

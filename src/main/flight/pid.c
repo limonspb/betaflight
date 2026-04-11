@@ -579,7 +579,15 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
 #if defined(USE_ALTITUDE_HOLD) && defined(USE_WING)
     if (FLIGHT_MODE(ALT_HOLD_MODE) && axis == FD_PITCH) {
         angleFeedforward = 0.0f;
-        angleTarget = autopilotAngle[AI_PITCH] + (float)pidProfile->angle_pitch_offset / 10.0f; // preserve wing pitch trim
+        float pitchTarget = autopilotAngle[AI_PITCH];
+#if defined(USE_POSITION_HOLD)
+        // Roll-pitch mix: compensate altitude loss during banking
+        // Banking reduces effective lift; pitch up (more negative) to maintain altitude
+        if (FLIGHT_MODE(POS_HOLD_MODE) && isAutopilotInControl() && autopilotConfig()->rollPitchMix > 0) {
+            pitchTarget -= fabsf((float)autopilotConfig()->rollPitchMix / 100.0f * autopilotAngle[AI_ROLL]);
+        }
+#endif
+        angleTarget = pitchTarget + (float)pidProfile->angle_pitch_offset / 10.0f; // preserve wing pitch trim
         angleLimit = fmaxf(angleLimit, 45.0f); // ensure sufficient pitch authority for altitude hold
     }
 #endif
@@ -593,6 +601,13 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
         }
         // limit pilot requested angle to half the autopilot angle to avoid excess speed and chaotic stops
         angleLimit = fminf(0.5f * autopilotConfig()->maxAngle, angleLimit);
+    }
+#endif
+#if defined(USE_POSITION_HOLD) && defined(USE_WING)
+    if (FLIGHT_MODE(POS_HOLD_MODE) && axis == FD_ROLL && isAutopilotInControl()) {
+        angleFeedforward = 0.0f;
+        angleTarget = autopilotAngle[AI_ROLL];
+        angleLimit = fmaxf(angleLimit, (float)autopilotConfig()->maxAngle);
     }
 #endif
 
