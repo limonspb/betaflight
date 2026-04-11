@@ -22,7 +22,7 @@
 
 #ifdef USE_WING
 
-extern float autopilotAngle[RP_AXIS_COUNT]; // NOTE: ANGLES ARE IN CENTIDEGREES
+extern float autopilotAngle[RP_AXIS_COUNT]; // NOTE: ANGLES ARE IN DEGREES
 
 void autopilotInit(void);
 void resetAltitudeControl(void);
@@ -34,5 +34,9 @@ void altitudeControl(float targetAltitudeCm, float taskIntervalS, float targetAl
 bool isBelowLandingAltitude(void);
 float getAutopilotThrottle(void);
 bool isAutopilotInControl(void);
+
+#ifdef USE_GPS_RESCUE
+void setThrottleCut(bool cut);
+#endif // USE_GPS_RESCUE
 
 #endif // USE_WING

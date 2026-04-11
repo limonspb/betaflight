@@ -576,6 +576,13 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
 #ifdef USE_GPS_RESCUE
     angleTarget += gpsRescueAngle[axis] / 100.0f; // Angle is in centidegrees, stepped on roll at 10Hz but not on pitch
 #endif
+#if defined(USE_ALTITUDE_HOLD) && defined(USE_WING)
+    if (FLIGHT_MODE(ALT_HOLD_MODE) && axis == FD_PITCH) {
+        angleFeedforward = 0.0f;
+        angleTarget = autopilotAngle[AI_PITCH] + (float)pidProfile->angle_pitch_offset / 10.0f; // preserve wing pitch trim
+        angleLimit = fmaxf(angleLimit, 45.0f); // ensure sufficient pitch authority for altitude hold
+    }
+#endif
 #if defined(USE_POSITION_HOLD) && !defined(USE_WING)
     if (FLIGHT_MODE(POS_HOLD_MODE)) {
         angleFeedforward = 0.0f; // otherwise the lag of the PT3 carries recent stick inputs into the hold
@@ -608,7 +615,11 @@ STATIC_UNIT_TESTED FAST_CODE_NOINLINE float pidLevel(int axis, const pidProfile_
     // this filter runs at ATTITUDE_CUTOFF_HZ, currently 50hz, so GPS roll may be a bit steppy
     angleRate = pt3FilterApply(&pidRuntime.attitudeFilter[axis], angleRate);
 
-    if (FLIGHT_MODE(ANGLE_MODE| GPS_RESCUE_MODE | POS_HOLD_MODE)) {
+    if (FLIGHT_MODE(ANGLE_MODE| GPS_RESCUE_MODE | POS_HOLD_MODE)
+#if defined(USE_ALTITUDE_HOLD) && defined(USE_WING)
+        || FLIGHT_MODE(ALT_HOLD_MODE)
+#endif
+    ) {
         currentPidSetpoint = angleRate;
     } else {
         // can only be HORIZON mode - crossfade Angle rate and Acro rate
@@ -1112,7 +1123,11 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
 #endif
                 ;
     levelMode_e levelMode;
-    if (FLIGHT_MODE(ANGLE_MODE | HORIZON_MODE | GPS_RESCUE_MODE)) {
+    if (FLIGHT_MODE(ANGLE_MODE | HORIZON_MODE | GPS_RESCUE_MODE)
+#if defined(USE_ALTITUDE_HOLD) && defined(USE_WING)
+        || FLIGHT_MODE(ALT_HOLD_MODE)
+#endif
+    ) {
         if (pidRuntime.levelRaceMode && !isExternalAngleModeRequest) {
             levelMode = LEVEL_MODE_R;
         } else {

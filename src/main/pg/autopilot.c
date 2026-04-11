@@ -28,7 +28,7 @@
 
 #include "autopilot.h"
 
-PG_REGISTER_WITH_RESET_TEMPLATE(autopilotConfig_t, autopilotConfig, PG_AUTOPILOT, 6);
+PG_REGISTER_WITH_RESET_TEMPLATE(autopilotConfig_t, autopilotConfig, PG_AUTOPILOT, 7);
 
 PG_RESET_TEMPLATE(autopilotConfig_t, autopilotConfig,
     .landingAltitudeM = 4,
@@ -102,4 +102,7 @@ PG_RESET_TEMPLATE(autopilotConfig_t, autopilotConfig,
     // Safety: Geofence
     .maxDistanceFromHomeM = 0,            // Disabled by default
     .geofenceAction = AP_GEOFENCE_LAND,   // Land at current position
+
+    // Wing-specific parameters
+    .cruiseThrottle = 1400,               // 1400 PWM cruise throttle
 );

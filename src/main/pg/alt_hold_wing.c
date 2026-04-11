@@ -32,9 +32,11 @@
 
 #include "alt_hold.h"
 
-PG_REGISTER_WITH_RESET_TEMPLATE(altHoldConfig_t, altHoldConfig, PG_ALTHOLD_CONFIG, 4);
+PG_REGISTER_WITH_RESET_TEMPLATE(altHoldConfig_t, altHoldConfig, PG_ALTHOLD_CONFIG, 5);
 
 PG_RESET_TEMPLATE(altHoldConfig_t, altHoldConfig,
+    .deadband = 40,
+    .climbRate = 50,
 );
 #endif
 

@@ -312,6 +312,10 @@
 #define PARAM_NAME_ALT_HOLD_CLIMB_RATE "alt_hold_climb_rate"
 #endif
 
+#ifdef USE_WING
+#define PARAM_NAME_AP_CRUISE_THROTTLE "ap_cruise_throttle"
+#endif
+
 #ifdef USE_POSITION_HOLD
 #define PARAM_NAME_POS_HOLD_WITHOUT_MAG "pos_hold_without_mag"
 #define PARAM_NAME_POS_HOLD_DEADBAND "pos_hold_deadband"

@@ -28,7 +28,8 @@
 #include "pg/pg.h"
 
 typedef struct altHoldConfig_s {
-    uint8_t dummy;
+    uint8_t deadband;        // percentage of pitch stick range considered center (0-100)
+    uint8_t climbRate;       // target climb rate when stick deflected, in 10 cm/s units (e.g. 50 = 500 cm/s)
 } altHoldConfig_t;
 
 PG_DECLARE(altHoldConfig_t, altHoldConfig);

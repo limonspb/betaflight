@@ -122,6 +122,9 @@ typedef struct autopilotConfig_s {
     // Safety: Geofence (max distance from home)
     uint16_t maxDistanceFromHomeM;    // meters, 0 = disabled (default 0)
     uint8_t geofenceAction;           // autopilotGeofenceAction_e (default AP_GEOFENCE_LAND)
+
+    // Wing-specific parameters
+    uint16_t cruiseThrottle;          // wing cruise throttle PWM value (like hoverThrottle for MR)
 } autopilotConfig_t;
 
 PG_DECLARE(autopilotConfig_t, autopilotConfig);
