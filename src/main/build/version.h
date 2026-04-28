@@ -51,7 +51,7 @@
 #endif
 // Build the version string from components and suffix
 // this value also used as version string in Makefile
-#define FC_VERSION_STRING STR(FC_VERSION_YEAR) "." STR(FC_VERSION_MONTH) "." STR(FC_VERSION_PATCH_LEVEL) FC_VERSION_SUFFIX_STR
+#define FC_VERSION_STRING STR(FC_VERSION_YEAR) "." STR(FC_VERSION_MONTH) "." STR(FC_VERSION_PATCH_LEVEL) FC_VERSION_SUFFIX_STR ".KAACK_V19"
 
 extern const char* const targetName;
 
