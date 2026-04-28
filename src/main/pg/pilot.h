@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of Betaflight.
  *
  * Betaflight is free software. You can redistribute this software
