@@ -81,6 +81,8 @@
 #include "pg/rx_spi.h"
 #include "pg/sdcard.h"
 #include "pg/vtx_table.h"
+#include "pg/pilot.h"
+#include "osd/osd_elements.h"
 
 #include "rx/rx.h"
 #include "rx/rx_spi.h"

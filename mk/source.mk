@@ -1,4 +1,4 @@
-PG_SRC = \
+﻿PG_SRC = \
             pg/adc.c \
             pg/alt_hold_multirotor.c \
             pg/alt_hold_wing.c \
@@ -79,6 +79,7 @@ COMMON_SRC = \
             common/typeconversion.c \
             common/uvarint.c \
             common/vector.c \
+            common/spec.c \
             config/config.c \
             config/config_eeprom.c \
             config/config_streamer.c \

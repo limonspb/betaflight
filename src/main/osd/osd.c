@@ -89,6 +89,7 @@
 #include "pg/pg.h"
 #include "pg/pg_ids.h"
 #include "pg/stats.h"
+#include "pg/pilot.h"
 
 #include "rx/crsf.h"
 #include "rx/rc_stats.h"

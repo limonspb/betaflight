@@ -56,6 +56,7 @@
 #include "io/beeper.h"
 
 #include "osd/osd.h"
+#include "pg/pilot.h"
 #include "osd/osd_elements.h"
 #include "osd/osd_warnings.h"
 
