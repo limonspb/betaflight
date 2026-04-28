@@ -24,13 +24,13 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "platform.h"
+
+#ifdef USE_RPM_LIMIT
+
 #include "flight/mixer.h"
 #include "pg/motor.h"
 #include "drivers/motor.h"
-
-#include "platform.h"
-
-
 
 #include "common/spec.h"
 
@@ -248,3 +248,5 @@ specSettings_t specArray[] = {
     },
 
 };
+
+#endif // USE_RPM_LIMIT

@@ -1,4 +1,4 @@
-﻿PG_SRC = \
+PG_SRC = \
             pg/adc.c \
             pg/alt_hold_multirotor.c \
             pg/alt_hold_wing.c \

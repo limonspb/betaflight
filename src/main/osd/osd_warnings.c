@@ -259,7 +259,7 @@ void renderOsdWarning(char *warningText, bool *blinking, uint8_t *displayAttr)
     // Warn when in flip over after crash mode
     if (osdWarnGetState(OSD_WARNING_CRASHFLIP) && IS_RC_MODE_ACTIVE(BOXCRASHFLIP)) {
         if (isCrashFlipModeActive()) { // if was armed in crashflip mode
-            tfp_sprintf(warningText, CRASHFLIP_WARNING);
+            tfp_sprintf(warningText, pilotConfig()->extraTurtleModeWarning[0] ? pilotConfig()->extraTurtleModeWarning : CRASHFLIP_WARNING);
             *displayAttr = DISPLAYPORT_SEVERITY_WARNING;
             return;
         } else if (!ARMING_FLAG(ARMED)) { // if disarmed, but crashflip mode is activated (not allowed / can't happen)
