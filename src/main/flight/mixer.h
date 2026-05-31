@@ -74,6 +74,12 @@ typedef enum mixerType
     MIXER_EZLANDING = 3,
 } mixerType_e;
 
+typedef enum rpmLimiterType
+{
+    RPM_LIMITER_STANDARD = 0,
+    RPM_LIMITER_AER = 1,
+} rpmLimiterType_e;
+
 // Custom mixer data per motor
 typedef struct motorMixer_s {
     float throttle;
@@ -99,6 +105,7 @@ typedef struct mixerConfig_s {
     uint8_t mixer_type;
 #ifdef USE_RPM_LIMIT
     bool rpm_limit;
+    uint8_t rpm_limiter_type;
     uint16_t rpm_limit_p;
     uint16_t rpm_limit_i;
     uint16_t rpm_limit_d;

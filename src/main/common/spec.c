@@ -52,6 +52,7 @@ bool checkSpec(SpecType specType)
     return
         isMotorProtocolBidirDshot() &&
         mixerConfig()->rpm_limit == specArray[specType].rpm_limit &&
+        mixerConfig()->rpm_limiter_type == specArray[specType].rpm_limiter_type &&
         mixerConfig()->rpm_limit_value == specArray[specType].rpm_limit_value &&
         motorConfig()->motorPoleCount == specArray[specType].motorPoleCount &&
         mixerConfig()->rpm_limit_p == specArray[specType].rpm_limit_p &&
@@ -62,6 +63,7 @@ bool checkSpec(SpecType specType)
 void setSpec(SpecType specType)
 {
     mixerConfigMutable()->rpm_limit = specArray[specType].rpm_limit;
+    mixerConfigMutable()->rpm_limiter_type = specArray[specType].rpm_limiter_type;
     mixerConfigMutable()->rpm_limit_value = specArray[specType].rpm_limit_value;
     motorConfigMutable()->motorPoleCount = specArray[specType].motorPoleCount;
     motorConfigMutable()->kv = specArray[specType].kv;
@@ -75,6 +77,7 @@ specSettings_t specArray[] = {
     {
         "FREEDOM 18K", // Name
         true,    // bool rpm_limit;
+        0,       // uint8_t rpm_limiter_type; (RPM_LIMITER_STANDARD)
         25,      // uint16_t rpm_limit_p;
         10,      // uint16_t rpm_limit_i;
         8,       // uint16_t rpm_limit_d;
@@ -104,6 +107,7 @@ specSettings_t specArray[] = {
     {
         "MGP PRO 13K", // Name
         true,    // bool rpm_limit;
+        0,       // uint8_t rpm_limiter_type; (RPM_LIMITER_STANDARD)
         25,      // uint16_t rpm_limit_p;
         10,      // uint16_t rpm_limit_i;
         8,       // uint16_t rpm_limit_d;
@@ -133,6 +137,7 @@ specSettings_t specArray[] = {
     {
         "MAYHEM 24K", // Name
         true,    // bool rpm_limit;
+        0,       // uint8_t rpm_limiter_type; (RPM_LIMITER_STANDARD)
         25,      // uint16_t rpm_limit_p;
         10,      // uint16_t rpm_limit_i;
         8,       // uint16_t rpm_limit_d;
@@ -162,6 +167,7 @@ specSettings_t specArray[] = {
     {
         "TT 30K", // Name
         true,    // bool rpm_limit;
+        0,       // uint8_t rpm_limiter_type; (RPM_LIMITER_STANDARD)
         25,      // uint16_t rpm_limit_p;
         10,      // uint16_t rpm_limit_i;
         8,       // uint16_t rpm_limit_d;
@@ -192,6 +198,7 @@ specSettings_t specArray[] = {
     {
         "LA LLIGUETA 17K", // Name
         true,    // bool rpm_limit;
+        0,       // uint8_t rpm_limiter_type; (RPM_LIMITER_STANDARD)
         25,      // uint16_t rpm_limit_p;
         10,      // uint16_t rpm_limit_i;
         8,       // uint16_t rpm_limit_d;
@@ -221,6 +228,7 @@ specSettings_t specArray[] = {
     {
         "JOE SPEC 21K", // Name
         true,    // bool rpm_limit;
+        0,       // uint8_t rpm_limiter_type; (RPM_LIMITER_STANDARD)
         25,      // uint16_t rpm_limit_p;
         10,      // uint16_t rpm_limit_i;
         8,       // uint16_t rpm_limit_d;
@@ -243,6 +251,36 @@ specSettings_t specArray[] = {
 
             { "J  ",
               "S  ",
+              "   " },
+        }
+    },
+
+    {
+        "AER LIMITER", // Name
+        true,    // bool rpm_limit;
+        1,       // uint8_t rpm_limiter_type; (RPM_LIMITER_AER)
+        25,      // uint16_t rpm_limit_p;
+        10,      // uint16_t rpm_limit_i;
+        12,      // uint16_t rpm_limit_d;
+        10400,   // uint16_t rpm_limit_value;
+        14,      // uint8_t motorPoleCount;
+        1960,    // uint16_t kv;
+
+        {   // Logo groups
+            { "AER",
+              "   ",
+              "   " },
+
+            { " AE",
+              " R ",
+              "   " },
+
+            { "   ",
+              "AER",
+              "   " },
+
+            { "A  ",
+              "ER ",
               "   " },
         }
     },

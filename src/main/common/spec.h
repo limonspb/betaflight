@@ -39,6 +39,7 @@ typedef enum {
     SPEC_TT,
     SPEC_LLIGUETA,
     SPEC_JOE,
+    SPEC_AER_LIMITER,
     SPEC_COUNT // must be last
 } SpecType;
 
@@ -46,6 +47,7 @@ typedef enum {
 typedef struct specSettings_s {
     char name[MAX_NAME_SIZE]; // Null-terminated name string
     bool rpm_limit;
+    uint8_t rpm_limiter_type;
     uint16_t rpm_limit_p;
     uint16_t rpm_limit_i;
     uint16_t rpm_limit_d;

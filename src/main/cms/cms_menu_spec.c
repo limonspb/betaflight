@@ -115,6 +115,15 @@ static const void *cmsx_SetJoe(displayPort_t *pDisplay, const void *ptr)
     return NULL;
 }
 
+static const void *cmsx_SetAerLimiter(displayPort_t *pDisplay, const void *ptr)
+{
+    UNUSED(ptr);
+    setSpec(SPEC_AER_LIMITER);
+    saveConfigAndNotify();
+    cmsMenuExit(pDisplay, (const void *)(intptr_t)CMS_POPUP_SAVEREBOOT);
+    return NULL;
+}
+
 static const OSD_Entry cmsx_menuSpecEntries[] =
 {
     { "-- SELECT SPEC --", OME_Label, NULL, NULL },
@@ -125,6 +134,7 @@ static const OSD_Entry cmsx_menuSpecEntries[] =
     {specArray[SPEC_TT].name, OME_Funcall, cmsx_SetTt, NULL},
     {specArray[SPEC_LLIGUETA].name, OME_Funcall, cmsx_SetLl, NULL},
     {specArray[SPEC_JOE].name, OME_Funcall, cmsx_SetJoe, NULL},
+    {specArray[SPEC_AER_LIMITER].name, OME_Funcall, cmsx_SetAerLimiter, NULL},
 
     { "BACK", OME_Back, NULL, NULL },
     { NULL, OME_END, NULL, NULL}
