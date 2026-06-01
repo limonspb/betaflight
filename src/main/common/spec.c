@@ -256,7 +256,7 @@ specSettings_t specArray[] = {
     },
 
     {
-        "AER LIMITER", // Name
+        "AER", // Name
         true,    // bool rpm_limit;
         1,       // uint8_t rpm_limiter_type; (RPM_LIMITER_AER)
         25,      // uint16_t rpm_limit_p;
@@ -264,24 +264,24 @@ specSettings_t specArray[] = {
         12,      // uint16_t rpm_limit_d;
         10400,   // uint16_t rpm_limit_value;
         14,      // uint8_t motorPoleCount;
-        1960,    // uint16_t kv;
+        700,     // uint16_t kv;
 
         {   // Logo groups
             { "AER",
               "   ",
               "   " },
 
-            { " AE",
-              " R ",
-              "   " },
+            { "  A",
+              " E ",
+              "R  " },
 
             { "   ",
-              "AER",
-              "   " },
+              "   ",
+              "AER" },
 
             { "A  ",
-              "ER ",
-              "   " },
+              " E ",
+              "  R" },
         }
     },
 
