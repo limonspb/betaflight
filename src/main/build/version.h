@@ -46,12 +46,18 @@
 //  Generate FC_VERSION_SUFFIX_STR
 #if FC_PP_IS_EMPTY_SIMPLE(FC_VERSION_SUFFIX)
 # define FC_VERSION_SUFFIX_STR ""
+# define FC_KAACK_TAG_STR "-KAACK-V20"
 #else
 # define FC_VERSION_SUFFIX_STR "-" FC_VERSION_SUFFIX
+# define FC_KAACK_TAG_STR ".KAACK-V20"
 #endif
 // Build the version string from components and suffix
 // this value also used as version string in Makefile
-#define FC_VERSION_STRING STR(FC_VERSION_YEAR) "." STR(FC_VERSION_MONTH) "." STR(FC_VERSION_PATCH_LEVEL) FC_VERSION_SUFFIX_STR ".KAACK_V19"
+// NOTE: Must remain valid SemVer 2.0.0 (prerelease identifiers may only contain
+// [0-9A-Za-z-], joined by dots, with the whole prerelease block introduced by a single "-").
+// Betaflight Configurator's presets tab uses semver.gte() on this string, which throws
+// on invalid versions (e.g. underscores), so avoid "_" anywhere in this string.
+#define FC_VERSION_STRING STR(FC_VERSION_YEAR) "." STR(FC_VERSION_MONTH) "." STR(FC_VERSION_PATCH_LEVEL) FC_VERSION_SUFFIX_STR FC_KAACK_TAG_STR
 
 extern const char* const targetName;
 
