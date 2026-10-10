@@ -247,6 +247,64 @@ specSettings_t specArray[] = {
         }
     },
 
+    {
+        "UDL 32K", // Name
+        true,    // bool rpm_limit;
+        25,      // uint16_t rpm_limit_p;
+        10,      // uint16_t rpm_limit_i;
+        8,       // uint16_t rpm_limit_d;
+        32000,   // uint16_t rpm_limit_value;
+        12,      // uint8_t motorPoleCount;
+        10000,   // uint16_t kv;
+
+        {   // Logo groups
+            { "U32",
+              "   ",
+              "   " },
+
+            { " 32",
+              "U  ",
+              "   " },
+
+            { "U 2",
+              " 3 ",
+              "   " },
+
+            { "U3 ",
+              "  2",
+              "   " },
+        }
+    },
+
+    {
+        "UDL 35K", // Name
+        true,    // bool rpm_limit;
+        25,      // uint16_t rpm_limit_p;
+        10,      // uint16_t rpm_limit_i;
+        8,       // uint16_t rpm_limit_d;
+        35000,   // uint16_t rpm_limit_value;
+        12,      // uint8_t motorPoleCount;
+        10000,   // uint16_t kv;
+
+        {   // Logo groups
+            { "U35",
+              "   ",
+              "   " },
+
+            { " 35",
+              "U  ",
+              "   " },
+
+            { "U 5",
+              " 3 ",
+              "   " },
+
+            { "U3 ",
+              "  5",
+              "   " },
+        }
+    },
+
 };
 
 #endif // USE_RPM_LIMIT

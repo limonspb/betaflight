@@ -39,6 +39,8 @@ typedef enum {
     SPEC_TT,
     SPEC_LLIGUETA,
     SPEC_JOE,
+    SPEC_UDL_32,
+    SPEC_UDL_35,
     SPEC_COUNT // must be last
 } SpecType;
 
