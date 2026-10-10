@@ -46,10 +46,10 @@
 //  Generate FC_VERSION_SUFFIX_STR
 #if FC_PP_IS_EMPTY_SIMPLE(FC_VERSION_SUFFIX)
 # define FC_VERSION_SUFFIX_STR ""
-# define FC_KAACK_TAG_STR "-KAACK-V21"
+# define FC_KAACK_TAG_STR "-KAACK-V22"
 #else
 # define FC_VERSION_SUFFIX_STR "-" FC_VERSION_SUFFIX
-# define FC_KAACK_TAG_STR ".KAACK-V21"
+# define FC_KAACK_TAG_STR ".KAACK-V22"
 #endif
 // Build the version string from components and suffix
 // this value also used as version string in Makefile

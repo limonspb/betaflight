@@ -78,8 +78,8 @@
 
 #define USE_PID_DENOM_CHECK
 
-#ifdef USE_LED_STRIP_64
-#error USE_LED_STRIP_64 is not supported for this MCU, please use USE_LED_STRIP
-#endif
+// KAACK: upstream blocks USE_LED_STRIP_64 on F411 (not enough processing power
+// for 64 outputs per betaflight/betaflight#13249). Allow it here when explicitly
+// selected; LED_STRIP_MAX_LENGTH still defaults to 32 unless USE_LED_STRIP_64 is defined.
 
 #define FLASH_PAGE_SIZE ((uint32_t)0x4000) // 16K sectors
